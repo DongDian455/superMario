@@ -47,7 +47,7 @@ int main()
         current_time = time_now;
 
         // 设置屏幕中心位置
-        view_x = std::clamp<int>(round(0) - 0.5f * (SCREEN_WIDTH - CELL_SIZE), 0, CELL_SIZE * map_manager.get_map_width() - SCREEN_WIDTH);
+        view_x = std::clamp<int>(round(0) - 0.5f * (SCREEN_WIDTH - CELL_SIZE), 0, CELL_SIZE * map_manager.get_map_size() - SCREEN_WIDTH);
         view.reset(sf::FloatRect(view_x, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
         window.setView(view);
 

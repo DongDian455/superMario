@@ -61,7 +61,7 @@ Cell MapManager::createCellByPixel(sf::Color &pixel)
     }
 }
 
-std::pair<short, short> MapManager::convert_cell_to_rect(const short posX, const short posY)
+std::pair<short, short> MapManager::get_cell_rect(const short posX, const short posY)
 {
     unsigned short sprite_x = 0;
     unsigned short sprite_y = 0;
@@ -148,7 +148,7 @@ std::pair<short, short> MapManager::convert_cell_to_rect(const short posX, const
     return std::pair(sprite_x, sprite_y);
 }
 
-std::pair<short, short> MapManager::convert_bg_to_rect(const short posX, const short posY, const short map_height)
+std::pair<short, short> MapManager::get_bg_rect(const short posX, const short posY, const short map_height)
 {
     unsigned short sprite_x = 0;
     unsigned short sprite_y = 0;
@@ -264,7 +264,7 @@ std::pair<short, short> MapManager::convert_bg_to_rect(const short posX, const s
     }
 }
 
-int MapManager::get_map_width()
+int MapManager::get_map_size()
 {
     return map.size();
 }
@@ -285,11 +285,11 @@ void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg)
             std::pair<short, short> spritePos(-1, -1);
             if (draw_bg)
             {
-                spritePos = convert_bg_to_rect(a, b, map_height);
+                spritePos = get_bg_rect(a, b, map_height);
             }
             else if (Cell::Empty != map[a][b])
             {
-                spritePos = convert_cell_to_rect(a, b);
+                spritePos = get_cell_rect(a, b);
             }
 
             if (spritePos.first >= 0)
