@@ -1,0 +1,6 @@
+/.vscode
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+/.DS_Store
+/main.out
+/main.out.dSYM
