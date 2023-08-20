@@ -5,6 +5,7 @@
 
 #include "Headers/GlobalConfig.hpp"
 
+#include "Headers/Animation.hpp"
 #include "Headers/MapManager.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
@@ -30,7 +31,7 @@ int main()
 
     sf::Event event;
 
-    unsigned view_x;
+    unsigned int view_x = 0;
 
     steady_clock::time_point current_time = steady_clock::now();
 
@@ -54,14 +55,14 @@ int main()
         current_time = time_now;
 
         // 设置屏幕中心位置
-        view_x = std::clamp<int>(round(0) - 0.5f * (SCREEN_WIDTH - CELL_SIZE), 0, CELL_SIZE * MapManager::get_instance().get_map_size() - SCREEN_WIDTH);
+        view_x = std::clamp<int>(round(mario.posX) - 0.5f * (SCREEN_WIDTH - CELL_SIZE), 0, CELL_SIZE * MapManager::get_instance().get_map_size() - SCREEN_WIDTH);
         view.reset(sf::FloatRect(view_x, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
         window.setView(view);
 
         // 绘制内容
         window.clear(background_color);
-        MapManager::get_instance().draw_map(window, true);
-        MapManager::get_instance().draw_map(window, false);
+        MapManager::get_instance().draw_map(window, true, view_x);
+        MapManager::get_instance().draw_map(window, false, view_x);
         mario.draw_mario(window);
 
         window.display();

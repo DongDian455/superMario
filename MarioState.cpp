@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-#include "SFML/Graphics.hpp">
+#include <SFML/Graphics.hpp>
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
@@ -34,8 +34,7 @@ void IdelState::handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWi
     }
 }
 
-MoveState::MoveState() : animation(CELL_SIZE, "Resources/Images/MarioWalk.png", MARIO_WALK_ANIMATION_SPEED),
-                         isCanDraw(0), horizontal_speed(0), vertical_speed(0), jump_timer(0)
+MoveState::MoveState() : isCanDraw(0), horizontal_speed(0), vertical_speed(0), jump_timer(0), animation(CELL_SIZE, "Resources/Images/MarioWalk.png", MARIO_WALK_ANIMATION_SPEED)
 {
 }
 
@@ -69,7 +68,7 @@ void MoveState::handleHorizontal(Mario *mario)
         }
     }
 
-    // 更新马里奥水平位置
+    // 移动之后要检测是否发生了碰撞，如果碰撞了需要重新设置移动位置
     sf::FloatRect hit_box = mario->get_hit_box();
     hit_box.left += horizontal_speed;
 
@@ -88,6 +87,7 @@ void MoveState::handleHorizontal(Mario *mario)
     }
     else
     {
+        // 没有碰撞就直接更新位置
         (mario->posX) += horizontal_speed;
     }
 }
@@ -124,11 +124,15 @@ void MoveState::handleVertical(Mario *mario)
 
     hit_box = mario->get_hit_box();
     hit_box.top += vertical_speed;
+
     if (HitBoxUtils::check_mario_hit_box(hit_box))
     {
         // 有碰撞
         if (0 > vertical_speed)
         {
+            //检测是否碰撞到金币
+            HitBoxUtils::check_mario_hit_coin(hit_box);
+
             // 上升
             mario->posY = CELL_SIZE * (1 + floor((vertical_speed + mario->posY) / CELL_SIZE));
         }

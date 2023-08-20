@@ -4,3 +4,8 @@
 /.DS_Store
 /main.out
 /main.out.dSYM
+
+/.DS_Store
+/*.out
+/*.out.dSYM
+/*.dSYM

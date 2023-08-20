@@ -17,8 +17,8 @@ public:
     Mario();
 
     // 马里奥的位置
-    unsigned int posX;
-    unsigned int posY;
+    int posX;
+    int posY;
 
     bool flipped;
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include "Headers/GlobalConfig.hpp"
 #include <SFML/Graphics.hpp>
+#include "Headers/Animation.hpp"
 #include "Headers/MapManager.hpp"
 
 void MapManager::convert_map_to_cell(const std::string &filePath)
@@ -263,40 +264,6 @@ int MapManager::get_map_size()
     return map.size();
 }
 
-void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg)
-{
-    unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE));
-    unsigned short map_start = floor(0 / static_cast<float>(CELL_SIZE));
-    unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
-
-    for (unsigned short a = map_start; a < map_end; a++)
-    {
-        for (unsigned short b = 0; b < map_height; b++)
-        {
-            cell_sprite.setPosition(CELL_SIZE * a, CELL_SIZE * b);
-
-            // 获取转换的绘制位置
-            std::pair<short, short> spritePos(-1, -1);
-            if (draw_bg)
-            {
-                spritePos = get_bg_rect(a, b, map_height);
-            }
-            else if (Cell::Empty != map[a][b])
-            {
-                spritePos = get_cell_rect(a, b);
-            }
-
-            if (spritePos.first >= 0)
-            {
-                // 设置纹理的区域
-                cell_sprite.setTextureRect(sf::IntRect(CELL_SIZE * spritePos.first, CELL_SIZE * spritePos.second, CELL_SIZE, CELL_SIZE));
-                // 绘制精灵图层
-                i_window.draw(cell_sprite);
-            }
-        }
-    }
-}
-
 std::pair<short, short> MapManager::get_mario_birth_pos() const
 {
     unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE)) * 0.5f;
@@ -321,15 +288,13 @@ std::pair<short, short> MapManager::get_mario_birth_pos() const
     return std::pair(-1, -1);
 }
 
-std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const
+void MapManager::map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const
 {
-    std::vector<unsigned char> output;
 
     i_collision_cells.clear();
 
     for (short a = floor(i_hitbox.top / CELL_SIZE); a <= floor((ceil(i_hitbox.height + i_hitbox.top) - 1) / CELL_SIZE); a++)
     {
-        output.push_back(0);
 
         for (short b = floor(i_hitbox.left / CELL_SIZE); b <= floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE); b++)
         {
@@ -339,21 +304,13 @@ std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_
                 {
                     if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), map[b][a]))
                     {
-                        // Since C++ doesn't support returning 2 vectors, we're gonna change the argument vector.
-                        i_collision_cells.push_back(sf::Vector2i(b, a));
 
-                        output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+                        i_collision_cells.push_back(sf::Vector2i(b, a));
                     }
                 }
             }
-            else if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), Cell::Wall))
-            {
-                output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
-            }
         }
     }
-
-    return output;
 }
 
 std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const
@@ -372,12 +329,12 @@ std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_
                 {
                     if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), map[b][a]))
                     {
-                        // We're gonna return a vector of numbers. Each number is a binary representation of collisions in a single row.
+
                         output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
                     }
                 }
             }
-            // We're assuming that the map borders have walls.
+            // 边界也算是墙体
             else if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), Cell::Wall))
             {
                 output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
@@ -386,4 +343,118 @@ std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_
     }
 
     return output;
+}
+
+void MapManager::set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell)
+{
+    map[i_x][i_y] = i_cell;
+}
+
+sf::Color MapManager::get_map_sketch_pixel(const unsigned short i_x, const unsigned short i_y) const
+{
+    return map_sketch.getPixel(i_x, i_y);
+}
+
+void MapManager::add_particles(const unsigned short i_x, const unsigned short i_y)
+{
+    // Adding brick particles.
+    // I was too lazy to add randomness.
+    // It still looks cool, in my opinion.
+    brick_particles.push_back(MoveCell(i_x, i_y, -0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
+    brick_particles.push_back(MoveCell(i_x + 0.5f * CELL_SIZE, i_y, 0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
+    brick_particles.push_back(MoveCell(i_x, i_y + 0.5f * CELL_SIZE, -0.5f * BRICK_PARTICLE_SPEED, -BRICK_PARTICLE_SPEED));
+    brick_particles.push_back(MoveCell(i_x + 0.5f * CELL_SIZE, i_y + 0.5f * CELL_SIZE, 0.5f * BRICK_PARTICLE_SPEED, -BRICK_PARTICLE_SPEED));
+}
+
+void MapManager::add_question_block_coin(const unsigned short i_x, const unsigned short i_y)
+{
+    question_block_coins.push_back(MoveCell(i_x, i_y, 0, COIN_JUMP_SPEED));
+}
+
+void MapManager::update_map_cell_info()
+{
+    for (auto &question_block_coin : question_block_coins)
+    {
+        question_block_coin.vertical_speed += GRAVITY;
+
+        question_block_coin.y += question_block_coin.vertical_speed;
+    }
+
+    for (auto &brick_particle : brick_particles)
+    {
+        brick_particle.vertical_speed += GRAVITY;
+
+        brick_particle.x += brick_particle.horizontal_speed;
+        brick_particle.y += brick_particle.vertical_speed;
+    }
+
+    brick_particles.erase(remove_if(brick_particles.begin(), brick_particles.end(), [](const auto &i_brick_particle)
+                                    { return SCREEN_HEIGHT <= i_brick_particle.y; }),
+                          brick_particles.end());
+
+    question_block_coins.erase(remove_if(question_block_coins.begin(), question_block_coins.end(), [](const auto &i_question_block_coin)
+                                         { return 0 <= i_question_block_coin.vertical_speed; }),
+                               question_block_coins.end());
+
+    coin_animation.update();
+    question_block_animation.update();
+}
+
+void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x)
+{
+    update_map_cell_info();
+
+    unsigned short map_end = ceil((SCREEN_WIDTH + i_view_x) / static_cast<float>(CELL_SIZE));
+    unsigned short map_start = floor(i_view_x / static_cast<float>(CELL_SIZE));
+    unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
+
+    // 额外绘制爆出的金币
+    if (0 == draw_bg)
+    {
+        for (const auto &question_block_coin : question_block_coins)
+        {
+            coin_animation.set_position(question_block_coin.x, question_block_coin.y);
+            coin_animation.draw(i_window);
+        }
+    }
+
+    for (unsigned short a = map_start; a < map_end; a++)
+    {
+        for (unsigned short b = 0; b < map_height; b++)
+        {
+            cell_sprite.setPosition(CELL_SIZE * a, CELL_SIZE * b);
+
+            // 获取转换的绘制位置
+            std::pair<short, short> spritePos(-1, -1);
+            if (draw_bg)
+            {
+                spritePos = get_bg_rect(a, b, map_height);
+            }
+            else if (Cell::Empty != map[a][b])
+            {
+                if (Cell::Coin == map[a][b])
+                {
+                    coin_animation.set_position(CELL_SIZE * a, CELL_SIZE * b);
+                    coin_animation.draw(i_window);
+                }
+                else if (Cell::QuestionBlock == map[a][b])
+                {
+                    question_block_animation.set_position(CELL_SIZE * a, CELL_SIZE * b);
+                    question_block_animation.draw(i_window);
+                }
+                else
+                {
+                    spritePos = get_cell_rect(a, b);
+                }
+            }
+
+            if (spritePos.first >= 0)
+            {
+                // 设置纹理的区域
+                cell_sprite.setTextureRect(sf::IntRect(CELL_SIZE * spritePos.first, CELL_SIZE * spritePos.second, CELL_SIZE, CELL_SIZE));
+                // 绘制精灵图层
+                i_window.draw(cell_sprite);
+            }
+        }
+    }
 }

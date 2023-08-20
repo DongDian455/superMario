@@ -18,3 +18,24 @@ constexpr float GRAVITY = 0.25f;
 constexpr float MARIO_JUMP_SPEED = -4;
 constexpr float MAX_VERTICAL_SPEED = 8;
 constexpr unsigned char MARIO_JUMP_TIMER = 8;
+
+constexpr unsigned short COIN_ANIMATION_SPEED = 4;
+constexpr unsigned short QUESTION_BLOCK_ANIMATION_SPEED = 8;
+
+constexpr float BRICK_PARTICLE_SPEED = 4;
+constexpr float COIN_JUMP_SPEED = -6;
+
+struct MoveCell
+{
+    float horizontal_speed;
+    float vertical_speed;
+    float x;
+    float y;
+
+    MoveCell(const float i_x, const float i_y, const float i_horizontal_speed = 0, const float i_vertical_speed = 0) : horizontal_speed(i_horizontal_speed),
+                                                                                                                       vertical_speed(i_vertical_speed),
+                                                                                                                       x(i_x),
+                                                                                                                       y(i_y)
+    {
+    }
+};
