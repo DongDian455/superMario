@@ -6,12 +6,6 @@
 #include <SFML/Graphics.hpp>
 #include "Headers/MapManager.hpp"
 
-MapManager::MapManager()
-{
-    map_texture.loadFromFile("Resources/Images/Map.png");
-    cell_sprite.setTexture(map_texture);
-}
-
 void MapManager::convert_map_to_cell(const std::string &filePath)
 {
     map_sketch.loadFromFile(filePath);
@@ -61,7 +55,7 @@ Cell MapManager::createCellByPixel(sf::Color &pixel)
     }
 }
 
-std::pair<short, short> MapManager::get_cell_rect(const short posX, const short posY)
+std::pair<short, short> MapManager::get_cell_rect(const unsigned int posX, const unsigned int posY)
 {
     unsigned short sprite_x = 0;
     unsigned short sprite_y = 0;
@@ -148,7 +142,7 @@ std::pair<short, short> MapManager::get_cell_rect(const short posX, const short 
     return std::pair(sprite_x, sprite_y);
 }
 
-std::pair<short, short> MapManager::get_bg_rect(const short posX, const short posY, const short map_height)
+std::pair<short, short> MapManager::get_bg_rect(const unsigned int posX, const unsigned int posY, const unsigned int map_height)
 {
     unsigned short sprite_x = 0;
     unsigned short sprite_y = 0;
@@ -301,4 +295,95 @@ void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg)
             }
         }
     }
+}
+
+std::pair<short, short> MapManager::get_mario_birth_pos() const
+{
+    unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE)) * 0.5f;
+    unsigned short map_start = 0;
+    unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
+
+    for (unsigned short a = map_start; a < map_end; a++)
+    {
+        // 从第二层开始遍历
+        for (unsigned short b = map_height; b < map_height * 2; b++)
+        {
+
+            sf::Color pixel = map_sketch.getPixel(a, b);
+            // this color is unqiue in the sketch‘ second layer
+            if (sf::Color(255, 0, 0) == pixel)
+            {
+                return std::pair(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+            }
+        }
+    }
+
+    return std::pair(-1, -1);
+}
+
+std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const
+{
+    std::vector<unsigned char> output;
+
+    i_collision_cells.clear();
+
+    for (short a = floor(i_hitbox.top / CELL_SIZE); a <= floor((ceil(i_hitbox.height + i_hitbox.top) - 1) / CELL_SIZE); a++)
+    {
+        output.push_back(0);
+
+        for (short b = floor(i_hitbox.left / CELL_SIZE); b <= floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE); b++)
+        {
+            if (0 <= b && b < map.size())
+            {
+                if (0 <= a && a < map[0].size())
+                {
+                    if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), map[b][a]))
+                    {
+                        // Since C++ doesn't support returning 2 vectors, we're gonna change the argument vector.
+                        i_collision_cells.push_back(sf::Vector2i(b, a));
+
+                        output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+                    }
+                }
+            }
+            else if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), Cell::Wall))
+            {
+                output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+            }
+        }
+    }
+
+    return output;
+}
+
+std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const
+{
+    std::vector<unsigned char> output;
+    // 因为map存储的是每个方块，而每个方块占CELL_SIZE的大小，所以这里除以CELL_SIZE就能得到具体在哪个方块
+    for (short a = floor(i_hitbox.top / CELL_SIZE); a <= floor((ceil(i_hitbox.height + i_hitbox.top) - 1) / CELL_SIZE); a++)
+    {
+        output.push_back(0);
+
+        for (short b = floor(i_hitbox.left / CELL_SIZE); b <= floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE); b++)
+        {
+            if (0 <= b && b < map.size())
+            {
+                if (0 <= a && a < map[0].size())
+                {
+                    if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), map[b][a]))
+                    {
+                        // We're gonna return a vector of numbers. Each number is a binary representation of collisions in a single row.
+                        output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+                    }
+                }
+            }
+            // We're assuming that the map borders have walls.
+            else if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), Cell::Wall))
+            {
+                output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+            }
+        }
+    }
+
+    return output;
 }

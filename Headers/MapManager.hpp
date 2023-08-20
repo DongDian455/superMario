@@ -20,31 +20,51 @@ typedef std::vector<std::array<Cell, SCREEN_HEIGHT / CELL_SIZE>> GameMap;
 
 class MapManager
 {
-    //地图信息
+    // 地图信息
     sf::Image map_sketch;
-    //地图精灵
+    // 地图精灵
     sf::Texture map_texture;
-    //元素精灵
+    // 元素精灵
     sf::Sprite cell_sprite;
-
+    // 地图元素信息
     GameMap map;
 
+private:
+    MapManager()
+    {
+       
+        map_texture.loadFromFile("Resources/Images/Map.png");
+        cell_sprite.setTexture(map_texture);
+    }
+
 public:
-    MapManager();
-    //将图片素材转换成元素
+    ~MapManager() {  }
+    MapManager(const MapManager &) = delete;
+    MapManager &operator=(const MapManager &) = delete;
+    static MapManager &get_instance()
+    {
+        static MapManager instance;
+        return instance;
+    }
+    // 将图片素材转换成元素
     void convert_map_to_cell(const std::string &filePath);
-    //根据像素转换成对应的Cell
+    // 根据像素转换成对应的Cell
     Cell createCellByPixel(sf::Color &pixel);
 
-    //获取元素的绘制区域
-    std::pair<short,short> get_cell_rect(const short posX ,const short posY);
-    //获取背景的绘制区域
-    std::pair<short,short> get_bg_rect(const short posX ,const short posY,const short map_height);
+    // 获取元素的绘制区域
+    std::pair<short, short> get_cell_rect(const unsigned int posX, const unsigned int posY);
+    // 获取背景的绘制区域
+    std::pair<short, short> get_bg_rect(const unsigned int posX, const unsigned int posY, const unsigned int map_height);
 
-    //获取整个地图元素个数
+    std::pair<short, short> get_mario_birth_pos() const;
+
+    // 获取整个地图元素个数
     int get_map_size();
-    
-    //绘制地图
-    void draw_map(sf::RenderWindow &i_window,const bool draw_bg);
 
+    // 绘制地图
+    void draw_map(sf::RenderWindow &i_window, const bool draw_bg);
+
+    // 收集元素
+    std::vector<unsigned char> map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const;
+    std::vector<unsigned char> map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const;
 };
