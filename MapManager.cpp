@@ -5,6 +5,8 @@
 #include "Headers/GlobalConfig.hpp"
 #include <SFML/Graphics.hpp>
 #include "Headers/Animation.hpp"
+#include "Headers/MarioState.hpp"
+#include "Headers/Mario.hpp"
 #include "Headers/GenerateManager.hpp"
 #include "Headers/MapManager.hpp"
 

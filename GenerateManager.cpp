@@ -4,6 +4,8 @@
 
 #include "Headers/Animation.hpp"
 #include "Headers/GlobalConfig.hpp"
+#include "Headers/MarioState.hpp"
+#include "Headers/Mario.hpp"
 #include "Headers/GenerateManager.hpp"
 
 void GenerateManager::add_particles(const unsigned short i_x, const unsigned short i_y)
@@ -27,12 +29,19 @@ void GenerateManager::add_mushroom(const unsigned short i_x, const unsigned shor
     mushrooms.push_back(Mushroom(i_x, i_y));
 }
 
-void GenerateManager::update(const unsigned int i_view_x)
+void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
 {
 
     for (Mushroom &mushroom : mushrooms)
     {
         mushroom.update(i_view_x);
+        // Mushroom eating and becoming BIG, STRONG, MASCULINE!!!!
+        if (1 == mario.get_hit_box().intersects(mushroom.get_hit_box()))
+        {
+            mushroom.set_dead(1);
+            mario.setPowerState(true);
+            mario.set_position(mario.posX, mario.posY -= CELL_SIZE);
+        }
     }
 
     for (auto &question_block_coin : question_block_coins)
@@ -60,11 +69,16 @@ void GenerateManager::update(const unsigned int i_view_x)
 
     coin_animation.update();
     question_block_animation.update();
+
+    // Deleting mushrooms from the vector.
+    mushrooms.erase(remove_if(mushrooms.begin(), mushrooms.end(), [](const Mushroom &i_mushroom)
+                              { return 1 == i_mushroom.get_dead(); }),
+                    mushrooms.end());
 }
 
-void GenerateManager::draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x)
+void GenerateManager::draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x, Mario &mario)
 {
-    update(i_view_x);
+    update(i_view_x, mario);
 
     for (const auto &question_block_coin : question_block_coins)
     {

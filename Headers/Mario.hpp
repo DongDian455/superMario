@@ -6,6 +6,7 @@ class StateMachine;
 
 class Mario
 {
+    std::string cacheFile;
 
     sf::Texture mario_texture;
 
@@ -22,8 +23,12 @@ public:
 
     bool flipped;
 
-    void set_position(const int x, const int y);
-
+    /// @brief 更新马里奥的位置
+    /// @param x 
+    /// @param y 
+    /// @param is_update_pos true更新精灵图和真实位置， false只更新精灵图位置
+    void set_position(const int x, const int y,const bool is_update_pos=true);
+    
     void set_flipped(const bool flipped);
 
     void update_texture(const std::string &file);
@@ -34,5 +39,7 @@ public:
 
     void update_pos(sf::RenderWindow &i_window);
 
-    sf::FloatRect get_hit_box() const;
+    void setPowerState(bool isPowerUp);
+
+    sf::FloatRect get_hit_box();
 };

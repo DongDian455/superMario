@@ -4,7 +4,7 @@
 
 constexpr unsigned short SCREEN_HEIGHT = 240;
 constexpr unsigned short SCREEN_WIDTH = 320;
-constexpr unsigned char SCREEN_RESIZE = 2;
+constexpr unsigned char SCREEN_RESIZE = 1;
 
 constexpr std::chrono::microseconds FRAME_DURATION(16667);
 
@@ -26,8 +26,12 @@ constexpr float BRICK_PARTICLE_SPEED = 4;
 constexpr float COIN_JUMP_SPEED = -6;
 //屏幕外的绘制范围
 constexpr unsigned short ENTITY_UPDATE_AREA = 64;
-
+//蘑菇移动速度
 constexpr float MUSHROOM_SPEED = 1;
+//马里奥变大持续时间
+constexpr unsigned char MARIO_GROWTH_DURATION = 64;
+//马里奥变大闪烁间隔
+constexpr unsigned char MARIO_BLINKING = 4;
 
 struct MoveCell
 {

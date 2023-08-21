@@ -107,6 +107,8 @@ void Mushroom::update(const unsigned i_view_x)
         }
     }
 
+
+
     if (SCREEN_HEIGHT <= y)
     {
         dead = 1;

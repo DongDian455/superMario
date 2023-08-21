@@ -23,6 +23,8 @@ private:
     GenerateManager(const GenerateManager &) = delete;
     GenerateManager &operator=(const GenerateManager &) = delete;
 
+    void update(const unsigned int i_view_x, Mario &mario);
+
 public:
     static GenerateManager &get_instance()
     {
@@ -37,9 +39,7 @@ public:
 
     void draw_coin_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);
     void draw_question_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);
-    
 
-    void update(const unsigned int i_view_x);
     // 绘制生成物体的信息
-    void draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x);
+    void draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x, Mario &mario);
 };

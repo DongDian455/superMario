@@ -5,45 +5,49 @@
 #include "Animation.hpp"
 
 #define toStr(name) (#name)
+// 声明一个模板
+typedef std::function<void(bool)> FunUpdateAnimation;
 
 class Mario;
 
 class StateMachine;
 
+class PowerState
+{
+    unsigned short growth_timer;
+    bool is_power_up;
+    unsigned short invincible_timer;
+
+public:
+    PowerState();
+
+    bool isPowerUp();
+
+    void setPower(const bool power);
+
+    void update(Mario *mario,
+                const std::string normal,
+                const std::string power,
+                FunUpdateAnimation *fun);
+};
+
 // 状态类
 class State
 {
+protected:
+    std::shared_ptr<PowerState> power_up_state;
+
 public:
     virtual void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) = 0;
     virtual bool canDrawMario()
     {
         return true;
-    };
-};
+    }
 
-class IdelState : public State
-{
-public:
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window);
-};
-
-class MoveState : public State
-{
-    bool isCanDraw;
-    float horizontal_speed;
-
-    float vertical_speed;
-    unsigned char jump_timer;
-
-    Animation animation;
-
-    void handleHorizontal(Mario *mario);
-    void handleVertical(Mario *mario);
-
-public:
-    MoveState();
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) override;
-    bool canDrawMario() override;
+    virtual bool isCrouching()
+    {
+        return false;
+    }
 };
 
 class DeadState : public State
@@ -70,7 +74,13 @@ public:
 
     bool canDraw();
 
+    void setPowerState(bool isPowerUp);
+
+    bool isPowerUpState();
+    bool isCrouching();
+
 private:
     std::map<std::string, State *> m_states;
     State *m_currentState;
+    std::shared_ptr<PowerState> power_up_state;
 };

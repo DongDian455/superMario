@@ -6,12 +6,12 @@
 
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/Animation.hpp"
-#include "Headers/GenerateManager.hpp"
+
 
 #include "Headers/MapManager.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
-
+#include "Headers/GenerateManager.hpp"
 #include "Headers/MarioState.hpp"
 
 using namespace std;
@@ -66,7 +66,7 @@ int main()
         MapManager::get_instance().draw_map(window, true, view_x);
 
         // 绘制地图之外的物体信息
-        GenerateManager::get_instance().draw_info(window, view_x);
+        GenerateManager::get_instance().draw_info(window, view_x,mario);
 
         // 绘制地图,要在其他物体之后，这样可以让物体绘制在地图后面
         MapManager::get_instance().draw_map(window, false, view_x);

@@ -12,13 +12,16 @@ Mario::Mario() : posX(0), posY(0), flipped(0)
     mario_sprite.setPosition(posX, posY);
 }
 
-void Mario::set_position(const int x, const int y)
+void Mario::set_position(const int x, const int y, const bool is_update_pos)
 {
     if (x >= 0 && y >= 0)
     {
-        posX = x;
-        posY = y;
-        mario_sprite.setPosition(posX, posY);
+        if (is_update_pos)
+        {
+            posX = x;
+            posY = y;
+        }
+        mario_sprite.setPosition(x, y);
     }
 }
 
@@ -29,22 +32,25 @@ void Mario::set_flipped(const bool flipped)
 
 void Mario::update_texture(const std::string &file)
 {
+    if (cacheFile == file)
+    {
+        return;
+    }
     mario_texture.loadFromFile(file);
+    cacheFile = file;
 }
 
-sf::FloatRect Mario::get_hit_box() const
+sf::FloatRect Mario::get_hit_box()
 {
     // The hitbox will be small if Mario is small or crouching.
-    // if (1 == crouching || 0 == powerup_state)
-    // {
-    //     return sf::FloatRect(x, y, CELL_SIZE, CELL_SIZE);
-    // }
-    // else
-    // {
-    //     return sf::FloatRect(x, y, CELL_SIZE, 2 * CELL_SIZE);
-    // }
-
-    return sf::FloatRect(posX, posY, CELL_SIZE, CELL_SIZE);
+    if (!state_machine.isPowerUpState() || state_machine.isCrouching())
+    {
+        return sf::FloatRect(posX, posY, CELL_SIZE,CELL_SIZE);
+    }
+    else
+    {
+        return sf::FloatRect(posX, posY, CELL_SIZE,  2 * CELL_SIZE);
+    }
 }
 
 // void Mario::set_position_x(const int x)
@@ -66,14 +72,12 @@ sf::FloatRect Mario::get_hit_box() const
 
 void Mario::draw_mario(sf::RenderWindow &i_window)
 {
-    update_pos(i_window);
+    mario_sprite.setPosition(round(posX), round(posY));
 
-    
+    update_pos(i_window);
 
     if (state_machine.canDraw())
     {
-        mario_sprite.setPosition(round(posX), round(posY));
-
         if (0 == flipped)
         {
             mario_sprite.setTextureRect(sf::IntRect(0, 0, mario_texture.getSize().x, mario_texture.getSize().y));
@@ -84,13 +88,15 @@ void Mario::draw_mario(sf::RenderWindow &i_window)
         }
         i_window.draw(mario_sprite);
     }
-    else
-    {
-    }
 }
 
 void Mario::update_pos(sf::RenderWindow &i_window)
 {
 
     state_machine.update(this, i_window);
+}
+
+void Mario::setPowerState(bool isPowerUp)
+{
+    state_machine.setPowerState(isPowerUp);
 }
