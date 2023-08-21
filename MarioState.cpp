@@ -72,7 +72,7 @@ void MoveState::handleHorizontal(Mario *mario)
     sf::FloatRect hit_box = mario->get_hit_box();
     hit_box.left += horizontal_speed;
 
-    if (HitBoxUtils::check_mario_hit_box(hit_box))
+    if (HitBoxUtils::check_hit_box(hit_box))
     {
         if (0 < horizontal_speed)
         {
@@ -98,7 +98,7 @@ void MoveState::handleVertical(Mario *mario)
     hit_box.top++;
     if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        if (0 == vertical_speed && 1 == HitBoxUtils::check_mario_hit_box(hit_box))
+        if (0 == vertical_speed && 1 == HitBoxUtils::check_hit_box(hit_box))
         {
             //  速度为0，并且是在地上的时候才能添加速度和重置跳高时间
             vertical_speed = MARIO_JUMP_SPEED;
@@ -125,7 +125,7 @@ void MoveState::handleVertical(Mario *mario)
     hit_box = mario->get_hit_box();
     hit_box.top += vertical_speed;
 
-    if (HitBoxUtils::check_mario_hit_box(hit_box))
+    if (HitBoxUtils::check_hit_box(hit_box))
     {
         // 有碰撞
         if (0 > vertical_speed)
@@ -171,7 +171,7 @@ void MoveState::handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWi
     // 再次检测碰撞
     sf::FloatRect hit_box = mario->get_hit_box();
     hit_box.top++;
-    bool on_ground = HitBoxUtils::check_mario_hit_box(hit_box);
+    bool on_ground = HitBoxUtils::check_hit_box(hit_box);
     if (horizontal_speed == 0 && on_ground == 1)
     {
         i_state_machine.setState(toStr(IdelState));

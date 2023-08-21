@@ -5,6 +5,7 @@
 #include "Headers/GlobalConfig.hpp"
 #include <SFML/Graphics.hpp>
 #include "Headers/Animation.hpp"
+#include "Headers/GenerateManager.hpp"
 #include "Headers/MapManager.hpp"
 
 void MapManager::convert_map_to_cell(const std::string &filePath)
@@ -402,21 +403,11 @@ void MapManager::update_map_cell_info()
 
 void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x)
 {
-    update_map_cell_info();
-
+  
     unsigned short map_end = ceil((SCREEN_WIDTH + i_view_x) / static_cast<float>(CELL_SIZE));
     unsigned short map_start = floor(i_view_x / static_cast<float>(CELL_SIZE));
     unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
 
-    // 额外绘制爆出的金币
-    if (0 == draw_bg)
-    {
-        for (const auto &question_block_coin : question_block_coins)
-        {
-            coin_animation.set_position(question_block_coin.x, question_block_coin.y);
-            coin_animation.draw(i_window);
-        }
-    }
 
     for (unsigned short a = map_start; a < map_end; a++)
     {
@@ -434,13 +425,11 @@ void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const 
             {
                 if (Cell::Coin == map[a][b])
                 {
-                    coin_animation.set_position(CELL_SIZE * a, CELL_SIZE * b);
-                    coin_animation.draw(i_window);
+                    GenerateManager::get_instance().draw_coin_animation(i_window,CELL_SIZE * a, CELL_SIZE * b);
                 }
                 else if (Cell::QuestionBlock == map[a][b])
                 {
-                    question_block_animation.set_position(CELL_SIZE * a, CELL_SIZE * b);
-                    question_block_animation.draw(i_window);
+                    GenerateManager::get_instance().draw_question_animation(i_window,CELL_SIZE * a, CELL_SIZE * b);
                 }
                 else
                 {

@@ -1,11 +1,13 @@
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 
 #include "Headers/GlobalConfig.hpp"
-
 #include "Headers/Animation.hpp"
+#include "Headers/GenerateManager.hpp"
+
 #include "Headers/MapManager.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
@@ -59,10 +61,16 @@ int main()
         view.reset(sf::FloatRect(view_x, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
         window.setView(view);
 
-        // 绘制内容
         window.clear(background_color);
+        // 绘制背景
         MapManager::get_instance().draw_map(window, true, view_x);
+
+        // 绘制地图之外的物体信息
+        GenerateManager::get_instance().draw_info(window, view_x);
+
+        // 绘制地图,要在其他物体之后，这样可以让物体绘制在地图后面
         MapManager::get_instance().draw_map(window, false, view_x);
+        // 绘制马里奥
         mario.draw_mario(window);
 
         window.display();

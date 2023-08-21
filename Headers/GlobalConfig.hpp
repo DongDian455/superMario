@@ -24,6 +24,10 @@ constexpr unsigned short QUESTION_BLOCK_ANIMATION_SPEED = 8;
 
 constexpr float BRICK_PARTICLE_SPEED = 4;
 constexpr float COIN_JUMP_SPEED = -6;
+//屏幕外的绘制范围
+constexpr unsigned short ENTITY_UPDATE_AREA = 64;
+
+constexpr float MUSHROOM_SPEED = 1;
 
 struct MoveCell
 {

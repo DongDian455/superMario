@@ -46,10 +46,11 @@ private:
         cell_sprite.setTexture(map_texture);
     }
 
-public:
     ~MapManager() {}
     MapManager(const MapManager &) = delete;
     MapManager &operator=(const MapManager &) = delete;
+
+public:
     static MapManager &get_instance()
     {
         static MapManager instance;
