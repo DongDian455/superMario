@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+
 
 class StateManager;
 
@@ -13,7 +13,6 @@ class Mario
     sf::Sprite mario_sprite;
 
 public:
-    StateManager state_manager;
     Mario();
 
     // 马里奥的位置
@@ -21,6 +20,8 @@ public:
     int posY;
 
     bool flipped;
+
+    std::shared_ptr<StateManager> state_manager;
 
     /// @brief 更新马里奥的位置
     /// @param x
@@ -31,11 +32,10 @@ public:
     void set_flipped(const bool flipped);
 
     void update_texture(const std::string &file);
-    // void set_position_x(const int x);
-    // void set_position_y(const int y);
 
     void draw_mario(sf::RenderWindow &i_window);
 
-
     sf::FloatRect get_hit_box();
+
+    void reset();
 };

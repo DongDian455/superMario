@@ -1,17 +1,24 @@
 
 #include <cmath>
-#include <string>
 #include <memory>
+
 #include "Headers/GlobalConfig.hpp"
-#include <SFML/Graphics.hpp>
+
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include "Headers/Animation.hpp"
-#include "Headers/MarioState.hpp"
+
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
+
 #include "Headers/GenerateManager.hpp"
 #include "Headers/MapManager.hpp"
 
 void MapManager::convert_map_to_cell(const std::string &filePath)
 {
+    map.clear();
     map_sketch.loadFromFile(filePath);
 
     map.resize(map_sketch.getSize().x);
@@ -269,12 +276,11 @@ int MapManager::get_map_size()
 
 std::pair<short, short> MapManager::init_mario_and_enemy_pos() const
 {
-    unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE));
-    unsigned short map_start = 0;
+
     unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
 
     std::pair mario(-1, -1);
-    for (unsigned short a = map_start; a < map_sketch.getSize().x; a++)
+    for (unsigned short a = 0; a < map_sketch.getSize().x; a++)
     {
         // 从第二层开始遍历
         for (unsigned short b = map_height; b < map_height * 2; b++)
@@ -365,51 +371,6 @@ void MapManager::set_map_cell(const unsigned short i_x, const unsigned short i_y
 sf::Color MapManager::get_map_sketch_pixel(const unsigned short i_x, const unsigned short i_y) const
 {
     return map_sketch.getPixel(i_x, i_y);
-}
-
-void MapManager::add_particles(const unsigned short i_x, const unsigned short i_y)
-{
-    // Adding brick particles.
-    // I was too lazy to add randomness.
-    // It still looks cool, in my opinion.
-    brick_particles.push_back(MoveCell(i_x, i_y, -0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
-    brick_particles.push_back(MoveCell(i_x + 0.5f * CELL_SIZE, i_y, 0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
-    brick_particles.push_back(MoveCell(i_x, i_y + 0.5f * CELL_SIZE, -0.5f * BRICK_PARTICLE_SPEED, -BRICK_PARTICLE_SPEED));
-    brick_particles.push_back(MoveCell(i_x + 0.5f * CELL_SIZE, i_y + 0.5f * CELL_SIZE, 0.5f * BRICK_PARTICLE_SPEED, -BRICK_PARTICLE_SPEED));
-}
-
-void MapManager::add_question_block_coin(const unsigned short i_x, const unsigned short i_y)
-{
-    question_block_coins.push_back(MoveCell(i_x, i_y, 0, COIN_JUMP_SPEED));
-}
-
-void MapManager::update_map_cell_info()
-{
-    for (auto &question_block_coin : question_block_coins)
-    {
-        question_block_coin.vertical_speed += GRAVITY;
-
-        question_block_coin.y += question_block_coin.vertical_speed;
-    }
-
-    for (auto &brick_particle : brick_particles)
-    {
-        brick_particle.vertical_speed += GRAVITY;
-
-        brick_particle.x += brick_particle.horizontal_speed;
-        brick_particle.y += brick_particle.vertical_speed;
-    }
-
-    brick_particles.erase(remove_if(brick_particles.begin(), brick_particles.end(), [](const auto &i_brick_particle)
-                                    { return SCREEN_HEIGHT <= i_brick_particle.y; }),
-                          brick_particles.end());
-
-    question_block_coins.erase(remove_if(question_block_coins.begin(), question_block_coins.end(), [](const auto &i_question_block_coin)
-                                         { return 0 <= i_question_block_coin.vertical_speed; }),
-                               question_block_coins.end());
-
-    coin_animation.update();
-    question_block_animation.update();
 }
 
 void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x)

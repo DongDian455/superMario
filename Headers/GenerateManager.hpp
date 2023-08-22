@@ -55,4 +55,6 @@ public:
 
     // 绘制生成物体的信息
     void draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x, Mario &mario);
+
+    void reset();
 };

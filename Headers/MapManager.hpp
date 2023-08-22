@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 
+
 class Animation;
 
 constexpr unsigned short MAP_SKETCH_LAYER = 3;
@@ -67,14 +68,12 @@ public:
     std::pair<short, short> get_bg_rect(const unsigned int posX, const unsigned int posY, const unsigned int map_height);
 
     /// @brief 初始化敌人和马里奥
-    /// @return 返回马里奥的位置 
+    /// @return 返回马里奥的位置
     std::pair<short, short> init_mario_and_enemy_pos() const;
-    
 
     // 获取整个地图元素个数
     int get_map_size();
-    // 更新地图信息
-    void update_map_cell_info();
+
     // 绘制地图
     void draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x);
 
@@ -82,10 +81,6 @@ public:
     std::vector<unsigned char> map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const;
     // 收集碰撞的元素到i_collision_cells
     void map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const;
-
-    // 碰撞产出的元素
-    void add_particles(const unsigned short i_x, const unsigned short i_y);
-    void add_question_block_coin(const unsigned short i_x, const unsigned short i_y);
 
     void set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell);
     sf::Color get_map_sketch_pixel(const unsigned short i_x, const unsigned short i_y) const;

@@ -1,15 +1,13 @@
 #pragma once
 
-#include <chrono>
-
+// 屏幕信息
 constexpr unsigned short SCREEN_HEIGHT = 240;
 constexpr unsigned short SCREEN_WIDTH = 320;
 constexpr unsigned char SCREEN_RESIZE = 1;
-
-constexpr std::chrono::microseconds FRAME_DURATION(16667);
-
+// 绘制的基准大小！
 constexpr unsigned short CELL_SIZE = 16;
 
+// 马里奥相关
 constexpr float MARIO_WALK_ACCELERATION = 0.25f;
 constexpr float MARIO_WALK_SPEED = 2;
 constexpr unsigned short MARIO_WALK_ANIMATION_SPEED = 4;
@@ -19,22 +17,25 @@ constexpr float MARIO_JUMP_SPEED = -4;
 constexpr float MAX_VERTICAL_SPEED = 8;
 constexpr unsigned char MARIO_JUMP_TIMER = 8;
 
-constexpr unsigned short COIN_ANIMATION_SPEED = 4;
-constexpr unsigned short QUESTION_BLOCK_ANIMATION_SPEED = 8;
+constexpr unsigned char MARIO_DEATH_DURATION = 32;
+constexpr unsigned char MARIO_INVINCIBILITY_DURATION = 128;
 
-constexpr float BRICK_PARTICLE_SPEED = 4;
-constexpr float COIN_JUMP_SPEED = -6;
-// 屏幕外的绘制范围
-constexpr unsigned short ENTITY_UPDATE_AREA = 64;
-// 蘑菇移动速度
-constexpr float MUSHROOM_SPEED = 1;
 // 马里奥变大持续时间
 constexpr unsigned char MARIO_GROWTH_DURATION = 64;
 // 马里奥变大闪烁间隔
 constexpr unsigned char MARIO_BLINKING = 4;
 
-constexpr unsigned char MARIO_DEATH_DURATION = 32;
-constexpr unsigned char MARIO_INVINCIBILITY_DURATION = 128;
+// 金币显示相关
+constexpr unsigned short COIN_ANIMATION_SPEED = 4;
+constexpr unsigned short QUESTION_BLOCK_ANIMATION_SPEED = 8;
+constexpr float COIN_JUMP_SPEED = -6;
+// 碎块显示相关
+constexpr float BRICK_PARTICLE_SPEED = 4;
+
+// 屏幕外的绘制范围
+constexpr unsigned short ENTITY_UPDATE_AREA = 64;
+// 蘑菇移动速度
+constexpr float MUSHROOM_SPEED = 1;
 
 struct MoveCell
 {

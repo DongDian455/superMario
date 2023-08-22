@@ -1,11 +1,11 @@
 #include <cmath>
-#include <iostream>
+
 #include <SFML/Graphics.hpp>
 #include "Headers/GlobalConfig.hpp"
-#include "Headers/MarioState.hpp"
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
 
-Mario::Mario() : posX(0), posY(0), flipped(0)
+Mario::Mario() : posX(0), posY(0), flipped(0), state_manager(std::make_shared<StateManager>(StateManager()))
 {
 
     mario_sprite.setTexture(mario_texture);
@@ -43,7 +43,7 @@ void Mario::update_texture(const std::string &file)
 sf::FloatRect Mario::get_hit_box()
 {
     // The hitbox will be small if Mario is small or crouching.
-    if (!state_manager.isPowerUpState() || state_manager.isCrouching())
+    if (!state_manager->isPowerUpState() || state_manager->isCrouching())
     {
         return sf::FloatRect(posX, posY, CELL_SIZE, CELL_SIZE);
     }
@@ -53,14 +53,13 @@ sf::FloatRect Mario::get_hit_box()
     }
 }
 
-
 void Mario::draw_mario(sf::RenderWindow &i_window)
 {
     mario_sprite.setPosition(round(posX), round(posY));
-    //绘制前更新状态
-    state_manager.update(this, i_window);
+    // 绘制前更新状态
+    state_manager->update(this, i_window);
 
-    if (state_manager.canDraw())
+    if (state_manager->canDraw())
     {
         if (0 == flipped)
         {
@@ -72,4 +71,12 @@ void Mario::draw_mario(sf::RenderWindow &i_window)
         }
         i_window.draw(mario_sprite);
     }
+}
+
+void Mario::reset()
+{
+    posX = 0;
+    posY = 0;
+    flipped = 0;
+    state_manager = std::make_shared<StateManager>(StateManager());
 }

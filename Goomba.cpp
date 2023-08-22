@@ -1,12 +1,12 @@
-#include <array>
+
 #include <cmath>
-#include <chrono>
 #include <SFML/Graphics.hpp>
+
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/Animation.hpp"
 #include "Headers/MapManager.hpp"
-#include "Headers/Mushroom.hpp"
-#include "Headers/MarioState.hpp"
+
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
 #include "Headers/Enemy.hpp"
 #include "Headers/HitBoxUtils.hpp"
@@ -104,7 +104,7 @@ void Goomba::draw(const unsigned i_view_x, sf::RenderWindow &i_window)
 	}
 }
 
-void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<Enemy>> &i_enemies, Mario &i_mario)
+void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<Enemy>> &i_enemies)
 {
 	// I've already explained most of the code here in the Mario class.
 	// I know it's bad to write the same code multiple times.

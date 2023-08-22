@@ -3,10 +3,8 @@
 
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/Animation.hpp"
-#include "Headers/MarioState.hpp"
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
-#include "Headers/Enemy.hpp"
-#include "Headers/Goomba.hpp"
 #include "Headers/GenerateManager.hpp"
 #include "Headers/MapManager.hpp"
 #include "Headers/HitBoxUtils.hpp"

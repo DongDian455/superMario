@@ -8,14 +8,15 @@
 #include "Headers/Animation.hpp"
 
 #include "Headers/MapManager.hpp"
-#include "Headers/MarioState.hpp"
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
 #include "Headers/GenerateManager.hpp"
-#include "Headers/MarioState.hpp"
 #include "Headers/AudioManager.hpp"
 
 using namespace std;
 using namespace std::chrono;
+
+constexpr std::chrono::microseconds FRAME_DURATION(16667);
 
 int main()
 {
@@ -36,7 +37,7 @@ int main()
     unsigned int view_x = 0;
 
     steady_clock::time_point current_time = steady_clock::now();
-    
+
     AudioManager::get_instance().playBgMusic();
 
     while (window.isOpen())
@@ -46,6 +47,14 @@ int main()
             if (sf::Event::Closed == event.type)
             {
                 window.close();
+            }
+            else if (sf::Keyboard::Enter == event.key.code)
+            {
+                GenerateManager::get_instance().reset();
+                MapManager::get_instance().convert_map_to_cell("Resources/Images/LevelSketch0.png");
+                mario.reset();
+                auto mario_pos = MapManager::get_instance().init_mario_and_enemy_pos();
+                mario.set_position(mario_pos.first, mario_pos.second);
             }
         }
 

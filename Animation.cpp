@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <string>
 #include "Headers/Animation.hpp"
 
 Animation::Animation(const unsigned short i_frame_width,

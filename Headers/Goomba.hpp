@@ -2,8 +2,8 @@
 
 #include "Animation.hpp"
 #include "Enemy.hpp"
-#include <SFML/Graphics/Sprite.hpp>
-#include <memory>
+#include <SFML/Graphics.hpp>
+
 #include <SFML/Graphics/RenderWindow.hpp>
 
 constexpr unsigned short GOOMBA_DEATH_DURATION = 32;
@@ -27,10 +27,10 @@ class Goomba : public Enemy
 
 public:
 	Goomba(const bool i_underground, const float i_x, const float i_y);
-
+	~Goomba() {}
 	bool get_dead(const bool i_deletion) const;
 
 	void die(const unsigned char i_death_type);
 	void draw(const unsigned i_view_x, sf::RenderWindow &i_window);
-	void update(const unsigned i_view_x, const std::vector<std::shared_ptr<Enemy>> &i_enemies, Mario &i_mario);
+	void update(const unsigned i_view_x, const std::vector<std::shared_ptr<Enemy>> &i_enemies);
 };

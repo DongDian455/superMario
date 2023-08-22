@@ -1,23 +1,13 @@
-#include <array>
-#include <chrono>
 #include <SFML/Graphics.hpp>
-
-#include "Headers/Animation.hpp"
 #include "Headers/GlobalConfig.hpp"
-#include "Headers/MapManager.hpp"
-#include "Headers/Mushroom.hpp"
-#include "Headers/MarioState.hpp"
-#include "Headers/Mario.hpp"
 #include "Headers/Enemy.hpp"
 
-Enemy::Enemy(const float i_x, const float i_y) :
-	dead(0),
-	horizontal_speed(0),
-	vertical_speed(0),
-	x(i_x),
-	y(i_y)
+Enemy::Enemy(const float i_x, const float i_y) : dead(0),
+												 horizontal_speed(0),
+												 vertical_speed(0),
+												 x(i_x),
+												 y(i_y)
 {
-	
 }
 
 bool Enemy::get_dead(const bool i_deletion) const

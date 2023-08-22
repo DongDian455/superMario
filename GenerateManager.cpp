@@ -1,13 +1,13 @@
 
-#include <vector>
+
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include "Headers/Animation.hpp"
 #include "Headers/GlobalConfig.hpp"
-#include "Headers/MarioState.hpp"
+
+#include "Headers/Animation.hpp"
+
+#include "Headers/MarioStateManager.hpp"
 #include "Headers/Mario.hpp"
-#include "Headers/Enemy.hpp"
-#include "Headers/Goomba.hpp"
+
 #include "Headers/GenerateManager.hpp"
 #include "Headers/AudioManager.hpp"
 
@@ -47,7 +47,7 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
         if (1 == mario.get_hit_box().intersects(mushroom.get_hit_box()))
         {
             mushroom.set_dead(1);
-            mario.state_manager.setPowerState(&mario, true);
+            mario.state_manager->setPowerState(&mario, true);
         }
     }
 
@@ -84,19 +84,19 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
 
     for (unsigned short a = 0; a < enemies.size(); a++)
     {
-        enemies[a]->update(i_view_x, enemies, mario);
+        enemies[a]->update(i_view_x, enemies);
 
         if (1 != enemies[a]->get_dead(0) && 1 == mario.get_hit_box().intersects(enemies[a]->get_hit_box()))
         {
-            if (mario.state_manager.isFalling())
+            if (mario.state_manager->isFalling())
             {
                 AudioManager::get_instance().playKillEnemyEffect();
                 enemies[a]->die(1);
-                mario.state_manager.updateJumpSpeed(0.6f * MARIO_JUMP_SPEED);
+                mario.state_manager->updateJumpSpeed(0.6f * MARIO_JUMP_SPEED);
             }
             else
             {
-                mario.state_manager.die(1, mario);
+                mario.state_manager->die(1, mario);
             }
         }
     }
@@ -150,4 +150,13 @@ void GenerateManager::draw_question_animation(sf::RenderWindow &i_window, unsign
 {
     question_block_animation.set_position(x, y);
     question_block_animation.draw(i_window);
+}
+
+void GenerateManager::reset()
+{
+    mushrooms.clear();
+    enemies.clear();
+
+    brick_particles.clear();
+    question_block_coins.clear();
 }
