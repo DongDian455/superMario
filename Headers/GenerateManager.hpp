@@ -13,10 +13,16 @@ class GenerateManager
 
     std::vector<Mushroom> mushrooms;
 
+    sf::Sprite brick_sprite;
+    sf::Texture brick_texture;
+
 private:
     GenerateManager() : coin_animation(CELL_SIZE, "Resources/Images/Coin.png", COIN_ANIMATION_SPEED),
                         question_block_animation(CELL_SIZE, "Resources/Images/QuestionBlock.png", QUESTION_BLOCK_ANIMATION_SPEED)
     {
+        brick_texture.loadFromFile("Resources/Images/Map.png");
+        brick_sprite.setTexture(brick_texture);
+        brick_sprite.setTextureRect(sf::IntRect(0.25f * CELL_SIZE, CELL_SIZE * (0.25f + 2 * 0), 0.5f * CELL_SIZE, 0.5f * CELL_SIZE));
     }
 
     ~GenerateManager() {}
@@ -33,7 +39,7 @@ public:
     }
 
     // 碰撞产出的元素
-    void add_particles(const unsigned short i_x, const unsigned short i_y);
+    void add_brick_particles(const unsigned short i_x, const unsigned short i_y);
     void add_question_block_coin(const unsigned short i_x, const unsigned short i_y);
     void add_mushroom(const unsigned short i_x, const unsigned short i_y);
 

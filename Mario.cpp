@@ -45,11 +45,11 @@ sf::FloatRect Mario::get_hit_box()
     // The hitbox will be small if Mario is small or crouching.
     if (!state_machine.isPowerUpState() || state_machine.isCrouching())
     {
-        return sf::FloatRect(posX, posY, CELL_SIZE,CELL_SIZE);
+        return sf::FloatRect(posX, posY, CELL_SIZE, CELL_SIZE);
     }
     else
     {
-        return sf::FloatRect(posX, posY, CELL_SIZE,  2 * CELL_SIZE);
+        return sf::FloatRect(posX, posY, CELL_SIZE, 2 * CELL_SIZE);
     }
 }
 
@@ -92,11 +92,10 @@ void Mario::draw_mario(sf::RenderWindow &i_window)
 
 void Mario::update_pos(sf::RenderWindow &i_window)
 {
-
     state_machine.update(this, i_window);
 }
 
 void Mario::setPowerState(bool isPowerUp)
 {
-    state_machine.setPowerState(isPowerUp);
+    state_machine.setPowerState(this, isPowerUp);
 }

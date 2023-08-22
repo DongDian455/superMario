@@ -8,7 +8,7 @@
 #include "Headers/Mario.hpp"
 #include "Headers/GenerateManager.hpp"
 
-void GenerateManager::add_particles(const unsigned short i_x, const unsigned short i_y)
+void GenerateManager::add_brick_particles(const unsigned short i_x, const unsigned short i_y)
 {
     // Adding brick particles.
     // I was too lazy to add randomness.
@@ -40,7 +40,6 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
         {
             mushroom.set_dead(1);
             mario.setPowerState(true);
-            mario.set_position(mario.posX, mario.posY -= CELL_SIZE);
         }
     }
 
@@ -84,6 +83,12 @@ void GenerateManager::draw_info(sf::RenderWindow &i_window, const unsigned int i
     {
         coin_animation.set_position(question_block_coin.x, question_block_coin.y);
         coin_animation.draw(i_window);
+    }
+
+    for (const auto &brick_particle : brick_particles)
+    {
+        brick_sprite.setPosition(brick_particle.x, brick_particle.y);
+        i_window.draw(brick_sprite);
     }
 
     for (Mushroom &mushroom : mushrooms)

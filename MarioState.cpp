@@ -58,11 +58,13 @@ void PowerState::update(Mario *mario, const std::string normal, const std::strin
     }
 }
 
-void PowerState::setPower(const bool power)
+void PowerState::setPower(Mario *mario, const bool power)
 {
     is_power_up = power;
     if (isPowerUp())
     {
+        mario->set_position(mario->posX, mario->posY -= CELL_SIZE);
+
         printf("变大\n");
         growth_timer = MARIO_GROWTH_DURATION;
     }
@@ -72,41 +74,40 @@ void PowerState::setPower(const bool power)
     }
 }
 
-class IdelState : public State
-{
-public:
-    IdelState(std::shared_ptr<PowerState> &p)
-    {
-        power_up_state = p;
-    }
+// class IdelState : public State
+// {
+// public:
+//     IdelState(std::shared_ptr<PowerState> &p)
+//     {
+//         power_up_state = p;
+//     }
 
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window)
-    {
-        power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
-        if (i_state_machine.isCrouching())
-        {
-            mario->update_texture("Resources/Images/BigMarioCrouch.png");
-        }
+//     void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window)
+//     {
 
-        if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
-            1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            i_state_machine.setState(toStr(MoveState));
-            i_state_machine.update(mario, i_window);
-        }
-        else if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
-                 1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            i_state_machine.setState(toStr(MoveState));
-            i_state_machine.update(mario, i_window);
-        }
-        else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || 1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            i_state_machine.setState(toStr(MoveState));
-            i_state_machine.update(mario, i_window);
-        }
-    }
-};
+//         if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
+//             1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+//         {
+//             i_state_machine.setState(toStr(MoveState));
+//             i_state_machine.update(mario, i_window);
+//         }
+//         else if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+//                  1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+//         {
+//             i_state_machine.setState(toStr(MoveState));
+//             i_state_machine.update(mario, i_window);
+//         }
+//         else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || 1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+//         {
+//             i_state_machine.setState(toStr(MoveState));
+//             i_state_machine.update(mario, i_window);
+//         }
+//         else
+//         {
+//             power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
+//         }
+//     }
+// };
 
 class MoveState : public State
 {
@@ -135,7 +136,7 @@ class MoveState : public State
         {
             horizontal_speed = std::min(MARIO_WALK_ACCELERATION + horizontal_speed, MARIO_WALK_SPEED);
         }
-        else if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        else if ((0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) || crouching)
         {
             if (0 < horizontal_speed)
             {
@@ -174,35 +175,6 @@ class MoveState : public State
     void handleVertical(Mario *mario)
     {
         sf::FloatRect hit_box = mario->get_hit_box();
-        // if (power_up_state->isPowerUp())
-        // {
-
-        //     if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        //     {
-        //         if (0 == crouching)
-        //         {
-        //             crouching = 1;
-
-        //             mario->set_position(mario->posX, mario->posY + CELL_SIZE,false);
-        //         }
-        //     }
-        //     else
-        //     {
-        //         if (!HitBoxUtils::check_hit_box(hit_box))
-        //         {
-        //             crouching = 0;
-
-        //             mario->set_position(mario->posX, mario->posY - CELL_SIZE,false);
-        //         }
-        //         else
-        //         {
-        //             crouching = 0;
-        //             mario->set_position(mario->posX, mario->posY - CELL_SIZE,false);
-        //         }
-        //     }
-        // }
-
-        hit_box = mario->get_hit_box();
         hit_box.top++;
         if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
@@ -241,6 +213,12 @@ class MoveState : public State
                 // 检测是否碰撞到金币
                 HitBoxUtils::check_mario_hit_coin(hit_box);
 
+                if (power_up_state->isPowerUp())
+                {
+                    // 检测是否碰撞木块
+                    HitBoxUtils::check_mario_hit_bricks(hit_box);
+                }
+
                 // 上升
                 mario->posY = CELL_SIZE * (1 + floor((vertical_speed + mario->posY) / CELL_SIZE));
             }
@@ -256,6 +234,44 @@ class MoveState : public State
         {
             // 更新马里奥垂直位置
             (mario->posY) += vertical_speed;
+        }
+    }
+
+    void handleCrouch(Mario *mario)
+    {
+        sf::FloatRect hit_box = mario->get_hit_box();
+        if (power_up_state->isPowerUp())
+        {
+
+            if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                if (0 == crouching)
+                {
+                    crouching = 1;
+                    std::cout << "蹲下" << crouching << std::endl;
+
+                    mario->set_position(mario->posX, mario->posY + CELL_SIZE);
+                    mario->update_texture("Resources/Images/BigMarioCrouch.png");
+                }
+            }
+            else if (crouching)
+            {
+                crouching = 0;
+                std::cout << "起身" << crouching << std::endl;
+                mario->set_position(mario->posX, mario->posY - CELL_SIZE);
+
+                // if (!HitBoxUtils::check_hit_box(hit_box))
+                // {
+                //     crouching = 0;
+
+                //     mario->set_position(mario->posX, mario->posY - CELL_SIZE);
+                // }
+                // else
+                // {
+                //     crouching = 0;
+                //     mario->set_position(mario->posX, mario->posY - CELL_SIZE);
+                // }
+            }
         }
     }
 
@@ -275,6 +291,7 @@ public:
     {
         isCanDraw = 1;
 
+        handleCrouch(mario);
         handleHorizontal(mario);
         handleVertical(mario);
 
@@ -291,10 +308,16 @@ public:
         sf::FloatRect hit_box = mario->get_hit_box();
         hit_box.top++;
         bool on_ground = HitBoxUtils::check_hit_box(hit_box);
-        if (horizontal_speed == 0 && on_ground == 1)
+
+        if (crouching)
         {
-            i_state_machine.setState(toStr(IdelState));
+            mario->update_texture("Resources/Images/BigMarioCrouch.png");
         }
+        else if (horizontal_speed == 0 && on_ground == 1)
+        {
+            power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
+        }
+
         else if (0 == on_ground)
         {
             power_up_state->update(mario, "Resources/Images/MarioJump.png", "Resources/Images/BigMarioJump.png", nullptr);
@@ -353,22 +376,20 @@ void DeadState::handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWi
 {
 }
 
-void CrouchingState::handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window)
-{
-}
-
 StateMachine::StateMachine() : power_up_state(std::make_shared<PowerState>(PowerState()))
 {
-    m_states[toStr(IdelState)] = new IdelState(power_up_state);
+    // m_states[toStr(IdelState)] = new IdelState(power_up_state);
     m_states[toStr(MoveState)] = new MoveState(power_up_state);
-    m_states[toStr(CrouchingState)] = new CrouchingState();
+
     m_states[toStr(DeadState)] = new DeadState();
+
+    m_currentState = m_states[toStr(MoveState)];
 }
 
 void StateMachine::setState(std::string &&clazz)
 {
-    m_currentState = m_states[clazz];
-    std::cout << "setState:" << clazz << std::endl;
+    // m_currentState = m_states[clazz];
+    // std::cout << "setState:" << clazz << std::endl;
 }
 
 void StateMachine::update(Mario *mario, sf::RenderWindow &i_window)
@@ -381,9 +402,9 @@ bool StateMachine::canDraw()
     return m_currentState->canDrawMario();
 }
 
-void StateMachine::setPowerState(bool isPowerUp)
+void StateMachine::setPowerState(Mario *mario, bool isPowerUp)
 {
-    power_up_state->setPower(isPowerUp);
+    power_up_state->setPower(mario, isPowerUp);
 }
 
 bool StateMachine::isPowerUpState()

@@ -23,7 +23,7 @@ public:
 
     bool isPowerUp();
 
-    void setPower(const bool power);
+    void setPower(Mario *mario,const bool power);
 
     void update(Mario *mario,
                 const std::string normal,
@@ -56,11 +56,6 @@ public:
     void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) override;
 };
 
-class CrouchingState : public State
-{
-public:
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) override;
-};
 
 // 状态机类
 class StateMachine
@@ -74,7 +69,7 @@ public:
 
     bool canDraw();
 
-    void setPowerState(bool isPowerUp);
+    void setPowerState(Mario *mario,bool isPowerUp);
 
     bool isPowerUpState();
     bool isCrouching();
