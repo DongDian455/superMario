@@ -290,15 +290,18 @@ std::pair<short, short> MapManager::init_mario_and_enemy_pos() const
             // this color is unqiue in the sketch‘ second layer
             if (sf::Color(255, 0, 0) == pixel)
             {
+                // 马里奥位置
                 mario = std::pair(CELL_SIZE * a, CELL_SIZE * (b - map_height));
             }
             else if (sf::Color(182, 73, 0) == pixel)
             {
+                // 敌人位置
                 GenerateManager::get_instance().add_enemy(CELL_SIZE * a, CELL_SIZE * (b - map_height));
             }
             else if (sf::Color(0, 219, 0) == pixel)
             {
-                // GenerateManager::get_instance().add_enemy(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+                //另一种敌人，单这里简单做了
+                GenerateManager::get_instance().add_enemy(CELL_SIZE * a, CELL_SIZE * (b - map_height));
             }
         }
     }
