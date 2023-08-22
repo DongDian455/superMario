@@ -13,9 +13,6 @@
 
 void GenerateManager::add_brick_particles(const unsigned short i_x, const unsigned short i_y)
 {
-    // Adding brick particles.
-    // I was too lazy to add randomness.
-    // It still looks cool, in my opinion.
     brick_particles.push_back(MoveCell(i_x, i_y, -0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
     brick_particles.push_back(MoveCell(i_x + 0.5f * CELL_SIZE, i_y, 0.25f * BRICK_PARTICLE_SPEED, -1.5f * BRICK_PARTICLE_SPEED));
     brick_particles.push_back(MoveCell(i_x, i_y + 0.5f * CELL_SIZE, -0.5f * BRICK_PARTICLE_SPEED, -BRICK_PARTICLE_SPEED));
@@ -43,7 +40,7 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
     for (Mushroom &mushroom : mushrooms)
     {
         mushroom.update(i_view_x);
-        // Mushroom eating and becoming BIG, STRONG, MASCULINE!!!!
+
         if (1 == mario.get_hit_box().intersects(mushroom.get_hit_box()))
         {
             mushroom.set_dead(1);
@@ -77,7 +74,6 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
     coin_animation.update();
     question_block_animation.update();
 
-    // Deleting mushrooms from the vector.
     mushrooms.erase(remove_if(mushrooms.begin(), mushrooms.end(), [](const Mushroom &i_mushroom)
                               { return 1 == i_mushroom.get_dead(); }),
                     mushrooms.end());
@@ -105,7 +101,7 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
     {
         if (1 == enemies[a]->get_dead(1))
         {
-            // We don't have to worry about memory leaks since we're using SMART POINTERS!
+
             enemies.erase(a + enemies.begin());
 
             a--;

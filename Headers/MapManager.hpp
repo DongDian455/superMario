@@ -76,7 +76,10 @@ public:
     // 绘制地图
     void draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x);
 
-    // 碰撞检测元素
+    /// @brief 碰撞检测
+    /// @param i_check_cells  需要检测的类型
+    /// @param i_hitbox  检测范围
+    /// @return  true 有交集，false没有交集
     bool map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const;
     // 收集碰撞的元素到i_collision_cells
     void map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const;

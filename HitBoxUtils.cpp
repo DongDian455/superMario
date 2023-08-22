@@ -15,7 +15,6 @@
 /// @return  ture 有碰撞，fale没碰撞
 bool HitBoxUtils::check_hit_box(const sf::FloatRect &i_hitbox)
 {
-
     return MapManager::get_instance().map_collision({Cell::ActivatedQuestionBlock, Cell::Brick, Cell::Pipe, Cell::QuestionBlock, Cell::Wall}, i_hitbox);
 }
 

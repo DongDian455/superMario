@@ -3,19 +3,16 @@
 #include "Animation.hpp"
 #include "Enemy.hpp"
 #include <SFML/Graphics.hpp>
-
+#include <memory>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 constexpr unsigned short GOOMBA_DEATH_DURATION = 32;
-// Why do I have so many animation speed constants? I use them only once.
 constexpr unsigned short GOOMBA_WALK_ANIMATION_SPEED = 32;
 constexpr float GOOMBA_SPEED = 1;
 
 class Goomba : public Enemy
 {
 
-	// The underground Goomba looks different than the regular Goomba.
-	bool underground;
 
 	unsigned short death_timer;
 
@@ -26,7 +23,7 @@ class Goomba : public Enemy
 	Animation walk_animation;
 
 public:
-	Goomba(const bool i_underground, const float i_x, const float i_y);
+	Goomba(const float i_x, const float i_y);
 	~Goomba() {}
 	bool get_dead(const bool i_deletion) const;
 

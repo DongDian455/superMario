@@ -12,24 +12,13 @@
 #include "Headers/HitBoxUtils.hpp"
 #include "Headers/Goomba.hpp"
 
-Goomba::Goomba(const bool i_underground, const float i_x, const float i_y) : Enemy(i_x, i_y),
-
-																			 underground(i_underground),
-																			 death_timer(GOOMBA_DEATH_DURATION),
-																			 walk_animation(CELL_SIZE, "Resources/Images/GoombaWalk.png", GOOMBA_WALK_ANIMATION_SPEED)
+Goomba::Goomba(const float i_x, const float i_y) : Enemy(i_x, i_y),
+												   death_timer(GOOMBA_DEATH_DURATION),
+												   walk_animation(CELL_SIZE, "Resources/Images/GoombaWalk.png", GOOMBA_WALK_ANIMATION_SPEED)
 {
 	horizontal_speed = -GOOMBA_SPEED;
 
-	if (0 == underground)
-	{
-		texture.loadFromFile("Resources/Images/GoombaDeath0.png");
-	}
-	else
-	{
-		texture.loadFromFile("Resources/Images/UndergroundGoombaDeath0.png");
-
-		walk_animation.set_texture_location("Resources/Images/UndergroundGoombaWalk.png");
-	}
+	texture.loadFromFile("Resources/Images/GoombaDeath0.png");
 }
 
 bool Goomba::get_dead(const bool i_deletion) const
@@ -50,14 +39,14 @@ void Goomba::die(const unsigned char i_death_type)
 	{
 	case 0:
 	{
-		// Instant death. Setting dead to 1 will immediately delete the object.
+
 		dead = 1;
 
 		break;
 	}
 	case 1:
 	{
-		// Goomba is squished by Mario.
+
 		death_timer--;
 
 		break;
@@ -66,19 +55,9 @@ void Goomba::die(const unsigned char i_death_type)
 	{
 		if (GOOMBA_DEATH_DURATION == death_timer)
 		{
-			// // Goomba dies from Koopa's shell.
-			// no_collision_dying = 1;
 
 			vertical_speed = 0.5f * MARIO_JUMP_SPEED;
-
-			if (0 == underground)
-			{
-				texture.loadFromFile("Resources/Images/GoombaDeath1.png");
-			}
-			else
-			{
-				texture.loadFromFile("Resources/Images/UndergroundGoombaDeath1.png");
-			}
+			texture.loadFromFile("Resources/Images/UndergroundGoombaDeath1.png");
 		}
 	}
 	}
@@ -86,7 +65,7 @@ void Goomba::die(const unsigned char i_death_type)
 
 void Goomba::draw(const unsigned i_view_x, sf::RenderWindow &i_window)
 {
-	// Making sure we don't draw Goomba outside the view.
+
 	if (-CELL_SIZE < round(y) && round(x) > static_cast<int>(i_view_x) - CELL_SIZE && round(x) < SCREEN_WIDTH + i_view_x && round(y) < SCREEN_HEIGHT)
 	{
 		if (GOOMBA_DEATH_DURATION > death_timer)
@@ -106,11 +85,7 @@ void Goomba::draw(const unsigned i_view_x, sf::RenderWindow &i_window)
 
 void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<Enemy>> &i_enemies)
 {
-	// I've already explained most of the code here in the Mario class.
-	// I know it's bad to write the same code multiple times.
-	// But I kinda don't care.
 
-	// Making sure we don't update Goomba outside the view.
 	bool is_can_update = -CELL_SIZE < y && x >= static_cast<int>(i_view_x) - CELL_SIZE - ENTITY_UPDATE_AREA && x < ENTITY_UPDATE_AREA + SCREEN_WIDTH + i_view_x && y < SCREEN_HEIGHT;
 
 	if (!is_can_update)
@@ -141,7 +116,6 @@ void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<E
 	{
 		bool changed = 0;
 
-		// Here we're making sure that when Goomba falls on another enemy, they don't intersect.
 		if (0 == get_dead(0))
 		{
 			for (unsigned short a = 0; a < i_enemies.size(); a++)
@@ -194,7 +168,6 @@ void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<E
 		{
 			bool changed = 0;
 
-			// Changing direction when colliding with another enemy.
 			for (unsigned short a = 0; a < i_enemies.size(); a++)
 			{
 				if (shared_from_this() != i_enemies[a] && 0 == i_enemies[a]->get_dead(0) && 1 == hit_box.intersects(i_enemies[a]->get_hit_box()))
@@ -212,23 +185,6 @@ void Goomba::update(const unsigned i_view_x, const std::vector<std::shared_ptr<E
 				x += horizontal_speed;
 			}
 		}
-
-		// if (0 == i_mario.get_dead() && 1 == get_hit_box().intersects(i_mario.get_hit_box()))
-		// {
-		// 	// If Mario is falling...
-		// 	if (0 < i_mario.get_vertical_speed())
-		// 	{
-		// 		//... then we get squished.
-		// 		die(1);
-
-		// 		i_mario.set_vertical_speed(0.5f * MARIO_JUMP_SPEED);
-		// 	}
-		// 	else
-		// 	{
-		// 		// Otherwise, kill Mario.
-		// 		i_mario.die(0);
-		// 	}
-		// }
 
 		walk_animation.update();
 	}

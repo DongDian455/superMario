@@ -18,8 +18,6 @@ class GenerateManager
     sf::Sprite brick_sprite;
     sf::Texture brick_texture;
 
-    // Using smart pointer because I'm smart.
-    //(Because we need to store both Goomba and Koopa objects in the same vector).
     std::vector<std::shared_ptr<Enemy>> enemies;
 
 private:
