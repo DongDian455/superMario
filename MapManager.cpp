@@ -331,14 +331,12 @@ void MapManager::map_collision(const std::vector<Cell> &i_check_cells, std::vect
     }
 }
 
-std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const
+bool MapManager::map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const
 {
-    std::vector<unsigned char> output;
+
     // 因为map存储的是每个方块，而每个方块占CELL_SIZE的大小，所以这里除以CELL_SIZE就能得到具体在哪个方块
     for (short a = floor(i_hitbox.top / CELL_SIZE); a <= floor((ceil(i_hitbox.height + i_hitbox.top) - 1) / CELL_SIZE); a++)
     {
-        output.push_back(0);
-
         for (short b = floor(i_hitbox.left / CELL_SIZE); b <= floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE); b++)
         {
             if (0 <= b && b < map.size())
@@ -347,21 +345,25 @@ std::vector<unsigned char> MapManager::map_collision(const std::vector<Cell> &i_
                 {
                     if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), map[b][a]))
                     {
-
-                        output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+                        return true;
                     }
                 }
             }
             // 边界也算是墙体
             else if (i_check_cells.end() != std::find(i_check_cells.begin(), i_check_cells.end(), Cell::Wall))
             {
-                output[a - floor(i_hitbox.top / CELL_SIZE)] += pow(2, floor((ceil(i_hitbox.left + i_hitbox.width) - 1) / CELL_SIZE) - b);
+
+                return true;
             }
         }
     }
 
-    return output;
+    return false;
 }
+
+Cell MapManager::get_map_cell(const int x, const int y){
+
+};
 
 void MapManager::set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell)
 {

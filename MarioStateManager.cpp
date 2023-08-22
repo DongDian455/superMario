@@ -40,6 +40,7 @@ public:
         is_power_up = power;
         if (isPowerUp())
         {
+            invincible_timer = 0;
             AudioManager::get_instance().playPowerUpEffect();
             mario->set_position(mario->posX, mario->posY -= CELL_SIZE);
 

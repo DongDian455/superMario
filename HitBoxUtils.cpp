@@ -16,12 +16,7 @@
 bool HitBoxUtils::check_hit_box(const sf::FloatRect &i_hitbox)
 {
 
-    std::vector<unsigned char> collision;
-
-    collision = MapManager::get_instance().map_collision({Cell::ActivatedQuestionBlock, Cell::Brick, Cell::Pipe, Cell::QuestionBlock, Cell::Wall}, i_hitbox);
-
-    return std::all_of(collision.begin(), collision.end(), [](const unsigned char i_value)
-                       { return 0 == i_value; }) == 0;
+    return MapManager::get_instance().map_collision({Cell::ActivatedQuestionBlock, Cell::Brick, Cell::Pipe, Cell::QuestionBlock, Cell::Wall}, i_hitbox);
 }
 
 /// @brief 检测是否撞击出金币

@@ -3,7 +3,6 @@
 #include <vector>
 #include <array>
 
-
 class Animation;
 
 constexpr unsigned short MAP_SKETCH_LAYER = 3;
@@ -77,11 +76,13 @@ public:
     // 绘制地图
     void draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x);
 
-    // 收集元素
-    std::vector<unsigned char> map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const;
+    // 碰撞检测元素
+    bool map_collision(const std::vector<Cell> &i_check_cells, const sf::FloatRect &i_hitbox) const;
     // 收集碰撞的元素到i_collision_cells
     void map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const;
 
     void set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell);
+    Cell get_map_cell(const int x, const int y);
+
     sf::Color get_map_sketch_pixel(const unsigned short i_x, const unsigned short i_y) const;
 };
