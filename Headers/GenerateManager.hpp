@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Mushroom.hpp"
+#include "Enemy.hpp"
+#include "Goomba.hpp"
 
 class GenerateManager
 {
@@ -15,6 +17,10 @@ class GenerateManager
 
     sf::Sprite brick_sprite;
     sf::Texture brick_texture;
+
+    // Using smart pointer because I'm smart.
+    //(Because we need to store both Goomba and Koopa objects in the same vector).
+    std::vector<std::shared_ptr<Enemy>> enemies;
 
 private:
     GenerateManager() : coin_animation(CELL_SIZE, "Resources/Images/Coin.png", COIN_ANIMATION_SPEED),
@@ -42,6 +48,7 @@ public:
     void add_brick_particles(const unsigned short i_x, const unsigned short i_y);
     void add_question_block_coin(const unsigned short i_x, const unsigned short i_y);
     void add_mushroom(const unsigned short i_x, const unsigned short i_y);
+    void add_enemy(const unsigned short i_x, const unsigned short i_y);
 
     void draw_coin_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);
     void draw_question_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);

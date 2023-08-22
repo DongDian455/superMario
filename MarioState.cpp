@@ -10,104 +10,115 @@
 #include "Headers/Animation.hpp"
 #include "Headers/MapManager.hpp"
 #include "Headers/HitBoxUtils.hpp"
+#include "Headers/AudioManager.hpp"
 
-PowerState::PowerState() : growth_timer(0), is_power_up(0), invincible_timer(0)
+class PowerState
 {
-}
+    unsigned short growth_timer;
+    unsigned short invincible_timer;
+    bool is_power_up;
 
-bool PowerState::isPowerUp()
-{
-    return is_power_up;
-}
-void PowerState::update(Mario *mario, const std::string normal, const std::string power, FunUpdateAnimation *fun)
-{
-    if (isPowerUp())
+public:
+    PowerState() : growth_timer(0), is_power_up(0), invincible_timer(0)
     {
-        if (0 < growth_timer)
+    }
+
+    bool isInvincible()
+    {
+        return invincible_timer / MARIO_BLINKING % 2 != 0;
+    }
+
+    bool isPowerUp()
+    {
+        return is_power_up;
+    }
+
+    void setPower(Mario *mario, const bool power)
+    {
+
+        is_power_up = power;
+        if (isPowerUp())
         {
-            growth_timer--;
+            AudioManager::get_instance().playPowerUpEffect();
+            mario->set_position(mario->posX, mario->posY -= CELL_SIZE);
+
+            printf("变大\n");
+            growth_timer = MARIO_GROWTH_DURATION;
         }
-
-        bool draw_big = 0 == growth_timer / MARIO_BLINKING % 2;
-
-        if (draw_big)
+        else
         {
-            mario->update_texture(power);
-            if (fun != nullptr)
+            printf("变小\n");
+        }
+    }
+
+    void update(Mario *mario,
+                const std::string normal,
+                const std::string power,
+                FunUpdateAnimation *fun)
+    {
+        if (isPowerUp())
+        {
+            if (0 < growth_timer)
             {
-                (*fun)(true);
+                growth_timer--;
+            }
+
+            bool draw_big = 0 == growth_timer / MARIO_BLINKING % 2;
+
+            if (draw_big)
+            {
+                mario->update_texture(power);
+                if (fun != nullptr)
+                {
+                    (*fun)(true);
+                }
+            }
+            else
+            {
+                mario->set_position(round(mario->posX), round(CELL_SIZE + mario->posY), false);
+                mario->update_texture(normal);
+                if (fun != nullptr)
+                {
+                    (*fun)(false);
+                }
             }
         }
         else
         {
-            mario->set_position(round(mario->posX), round(CELL_SIZE + mario->posY), false);
-            mario->update_texture(normal);
-            if (fun != nullptr)
+            bool is_draw = true;
+            if (invincible_timer > 0)
             {
-                (*fun)(false);
+                invincible_timer--;
+
+                is_draw = invincible_timer / MARIO_BLINKING % 2;
+            }
+
+            if (is_draw)
+            {
+                mario->update_texture(normal);
+                if (fun != nullptr)
+                {
+                    (*fun)(false);
+                }
             }
         }
     }
-    else
+
+    bool toDie(Mario &mario)
     {
-        if (fun != nullptr)
+        bool is_dead = 0 == growth_timer && 0 == invincible_timer && is_power_up == 0;
+
+        if (is_power_up)
         {
-            (*fun)(false);
+            AudioManager::get_instance().playPowerDownEffect();
+            is_power_up = 0;
+            mario.set_position(mario.posX, mario.posY += CELL_SIZE);
+            invincible_timer = MARIO_INVINCIBILITY_DURATION;
         }
-        mario->update_texture(normal);
+
+        return is_dead;
     }
-}
-
-void PowerState::setPower(Mario *mario, const bool power)
-{
-    is_power_up = power;
-    if (isPowerUp())
-    {
-        mario->set_position(mario->posX, mario->posY -= CELL_SIZE);
-
-        printf("变大\n");
-        growth_timer = MARIO_GROWTH_DURATION;
-    }
-    else
-    {
-        printf("变小\n");
-    }
-}
-
-// class IdelState : public State
-// {
-// public:
-//     IdelState(std::shared_ptr<PowerState> &p)
-//     {
-//         power_up_state = p;
-//     }
-
-//     void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window)
-//     {
-
-//         if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
-//             1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-//         {
-//             i_state_machine.setState(toStr(MoveState));
-//             i_state_machine.update(mario, i_window);
-//         }
-//         else if (0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
-//                  1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-//         {
-//             i_state_machine.setState(toStr(MoveState));
-//             i_state_machine.update(mario, i_window);
-//         }
-//         else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || 1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-//         {
-//             i_state_machine.setState(toStr(MoveState));
-//             i_state_machine.update(mario, i_window);
-//         }
-//         else
-//         {
-//             power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
-//         }
-//     }
-// };
+};
 
 class MoveState : public State
 {
@@ -183,6 +194,7 @@ class MoveState : public State
                 //  速度为0，并且是在地上的时候才能添加速度和重置跳高时间
                 vertical_speed = MARIO_JUMP_SPEED;
                 jump_timer = MARIO_JUMP_TIMER;
+                AudioManager::get_instance().playJumpEffect();
             }
             else if (0 < jump_timer) // The longer we press the jump button, the higher Mario jumps.
             {
@@ -239,7 +251,7 @@ class MoveState : public State
 
     void handleCrouch(Mario *mario)
     {
-        sf::FloatRect hit_box = mario->get_hit_box();
+
         if (power_up_state->isPowerUp())
         {
 
@@ -259,160 +271,251 @@ class MoveState : public State
                 crouching = 0;
                 std::cout << "起身" << crouching << std::endl;
                 mario->set_position(mario->posX, mario->posY - CELL_SIZE);
-
-                // if (!HitBoxUtils::check_hit_box(hit_box))
-                // {
-                //     crouching = 0;
-
-                //     mario->set_position(mario->posX, mario->posY - CELL_SIZE);
-                // }
-                // else
-                // {
-                //     crouching = 0;
-                //     mario->set_position(mario->posX, mario->posY - CELL_SIZE);
-                // }
             }
         }
     }
 
 public:
     MoveState(std::shared_ptr<PowerState> &p) : isCanDraw(0),
+                                                crouching(0),
                                                 horizontal_speed(0),
                                                 vertical_speed(0),
                                                 jump_timer(0),
-                                                crouching(0),
                                                 walk_animation(CELL_SIZE, "Resources/Images/MarioWalk.png", MARIO_WALK_ANIMATION_SPEED),
                                                 big_walk_animation(CELL_SIZE, "Resources/Images/BigMarioWalk.png", MARIO_WALK_ANIMATION_SPEED)
 
     {
         power_up_state = p;
     }
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) override
+    void handle(Mario *mario, sf::RenderWindow &i_window) override
     {
-        isCanDraw = 1;
+        try
+        {
+            isCanDraw = 1;
 
-        handleCrouch(mario);
-        handleHorizontal(mario);
-        handleVertical(mario);
+            handleCrouch(mario);
+            handleHorizontal(mario);
+            handleVertical(mario);
 
-        // 是否反转方向
-        if (0 < horizontal_speed)
-        {
-            mario->set_flipped(0);
-        }
-        else if (0 > horizontal_speed)
-        {
-            mario->set_flipped(1);
-        }
-        // 再次检测碰撞
-        sf::FloatRect hit_box = mario->get_hit_box();
-        hit_box.top++;
-        bool on_ground = HitBoxUtils::check_hit_box(hit_box);
-
-        if (crouching)
-        {
-            mario->update_texture("Resources/Images/BigMarioCrouch.png");
-        }
-        else if (horizontal_speed == 0 && on_ground == 1)
-        {
-            power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
-        }
-
-        else if (0 == on_ground)
-        {
-            power_up_state->update(mario, "Resources/Images/MarioJump.png", "Resources/Images/BigMarioJump.png", nullptr);
-        }
-        else if ((0 < horizontal_speed && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
-                  1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) ||
-                 (0 > horizontal_speed && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
-                  1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right)))
-
-        {
-            power_up_state->update(mario, "Resources/Images/MarioBrake.png", "Resources/Images/BigMarioBrake.png", nullptr);
-        }
-        else
-        {
-            isCanDraw = 0;
-
-            FunUpdateAnimation func = [this, mario, &i_window](bool isPowerUp) -> void
+            // 是否反转方向
+            if (0 < horizontal_speed)
             {
-                if (isPowerUp)
+                mario->set_flipped(0);
+            }
+            else if (0 > horizontal_speed)
+            {
+                mario->set_flipped(1);
+            }
+            // 再次检测碰撞
+            sf::FloatRect hit_box = mario->get_hit_box();
+            hit_box.top++;
+            bool on_ground = HitBoxUtils::check_hit_box(hit_box);
+
+            if (crouching)
+            {
+                mario->update_texture("Resources/Images/BigMarioCrouch.png");
+            }
+            else if (horizontal_speed == 0 && on_ground == 1)
+            {
+                power_up_state->update(mario, "Resources/Images/MarioIdle.png", "Resources/Images/BigMarioIdle.png", nullptr);
+            }
+
+            else if (0 == on_ground)
+            {
+                power_up_state->update(mario, "Resources/Images/MarioJump.png", "Resources/Images/BigMarioJump.png", nullptr);
+            }
+            else if ((0 < horizontal_speed && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
+                      1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) ||
+                     (0 > horizontal_speed && 0 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+                      1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right)))
+
+            {
+                power_up_state->update(mario, "Resources/Images/MarioBrake.png", "Resources/Images/BigMarioBrake.png", nullptr);
+            }
+            else
+            {
+                isCanDraw = 0;
+
+                FunUpdateAnimation func = [this, mario, &i_window](bool isPowerUp) -> void
                 {
-                    // 动画更新
-                    big_walk_animation.set_animation_speed(MARIO_WALK_ANIMATION_SPEED * MARIO_WALK_SPEED / abs(horizontal_speed));
-                    big_walk_animation.update();
+                    if (isPowerUp)
+                    {
+                        // 动画更新
+                        big_walk_animation.set_animation_speed(MARIO_WALK_ANIMATION_SPEED * MARIO_WALK_SPEED / abs(horizontal_speed));
+                        big_walk_animation.update();
 
-                    big_walk_animation.set_flipped(mario->flipped);
-                    big_walk_animation.set_position(round(mario->posX), round(mario->posY));
-                    big_walk_animation.draw(i_window);
-                }
-                else
-                {
-                    // 动画更新
-                    walk_animation.set_animation_speed(MARIO_WALK_ANIMATION_SPEED * MARIO_WALK_SPEED / abs(horizontal_speed));
-                    walk_animation.update();
+                        big_walk_animation.set_flipped(mario->flipped);
+                        big_walk_animation.set_position(round(mario->posX), round(mario->posY));
+                        big_walk_animation.draw(i_window);
+                    }
+                    else
+                    {
+                        // 动画更新
+                        walk_animation.set_animation_speed(MARIO_WALK_ANIMATION_SPEED * MARIO_WALK_SPEED / abs(horizontal_speed));
+                        walk_animation.update();
 
-                    walk_animation.set_flipped(mario->flipped);
-                    walk_animation.set_position(round(mario->posX), round(mario->posY));
-                    walk_animation.draw(i_window);
-                }
-            };
+                        walk_animation.set_flipped(mario->flipped);
+                        walk_animation.set_position(round(mario->posX), round(mario->posY));
+                        walk_animation.draw(i_window);
+                    }
+                };
 
-            power_up_state->update(mario, "Resources/Images/MarioBrake.png", "Resources/Images/BigMarioBrake.png", &func);
+                power_up_state->update(mario, "Resources/Images/MarioBrake.png", "Resources/Images/BigMarioBrake.png", &func);
+            }
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
         }
     }
     bool canDrawMario() override
     {
-        return isCanDraw;
+        return isCanDraw && !power_up_state->isInvincible();
     };
 
     bool isCrouching() override
     {
         return crouching;
     };
+
+    bool isFalling()
+    {
+        return vertical_speed > 0;
+    };
+    void updateJumpSpeed(const float i_value)
+    {
+        vertical_speed = i_value;
+    };
 };
 
-void DeadState::handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window)
+class DeadState
+{
+    float vertical_speed;
+    unsigned short death_timer;
+
+public:
+    DeadState() : death_timer(MARIO_DEATH_DURATION)
+    {
+    }
+
+    void update(Mario &mario)
+    {
+
+        if (mario.posY > SCREEN_HEIGHT)
+        {
+            return;
+        }
+        if (0 == death_timer)
+        {
+            vertical_speed = std::min(GRAVITY + vertical_speed, MAX_VERTICAL_SPEED);
+            mario.posY += vertical_speed;
+        }
+        else if (1 == death_timer)
+        {
+            vertical_speed = MARIO_JUMP_SPEED;
+        }
+
+        death_timer = std::max(0, death_timer - 1);
+    }
+};
+
+StateManager::StateManager() : power_state(std::make_shared<PowerState>(PowerState())),
+                               move_state(std::make_shared<MoveState>(MoveState(power_state))),
+                               dead_state(nullptr)
 {
 }
 
-StateMachine::StateMachine() : power_up_state(std::make_shared<PowerState>(PowerState()))
+void StateManager::update(Mario *mario, sf::RenderWindow &i_window)
 {
-    // m_states[toStr(IdelState)] = new IdelState(power_up_state);
-    m_states[toStr(MoveState)] = new MoveState(power_up_state);
-
-    m_states[toStr(DeadState)] = new DeadState();
-
-    m_currentState = m_states[toStr(MoveState)];
+    if (dead_state != nullptr)
+    {
+        dead_state->update(*mario);
+    }
+    else
+    {
+        move_state->handle(mario, i_window);
+    }
 }
 
-void StateMachine::setState(std::string &&clazz)
+bool StateManager::canDraw()
 {
-    // m_currentState = m_states[clazz];
-    // std::cout << "setState:" << clazz << std::endl;
+    if (dead_state != nullptr)
+    {
+        return true;
+    }
+    else
+    {
+        return move_state->canDrawMario();
+    }
 }
 
-void StateMachine::update(Mario *mario, sf::RenderWindow &i_window)
+void StateManager::setPowerState(Mario *mario, bool isPowerUp)
 {
-    m_currentState->handle(*this, mario, i_window);
+    power_state->setPower(mario, isPowerUp);
 }
 
-bool StateMachine::canDraw()
+bool StateManager::isPowerUpState()
 {
-    return m_currentState->canDrawMario();
+    return power_state->isPowerUp();
 }
 
-void StateMachine::setPowerState(Mario *mario, bool isPowerUp)
+bool StateManager::isCrouching()
 {
-    power_up_state->setPower(mario, isPowerUp);
+    if (dead_state != nullptr)
+    {
+        return false;
+    }
+    else
+    {
+        return move_state->isCrouching();
+    }
 }
 
-bool StateMachine::isPowerUpState()
+bool StateManager::isFalling()
 {
-    return power_up_state->isPowerUp();
+    if (dead_state != nullptr)
+    {
+        return false;
+    }
+    else
+    {
+        return move_state->isFalling();
+    }
+}
+void StateManager::updateJumpSpeed(const float i_value)
+{
+    if (dead_state == nullptr)
+    {
+        move_state->updateJumpSpeed(i_value);
+    }
 }
 
-bool StateMachine::isCrouching()
+void StateManager::die(const short type, Mario &mario)
 {
-    return m_currentState->isCrouching();
+    if (dead_state != nullptr)
+    {
+        return;
+    }
+
+    if (0 == type)
+    {
+        // 立马死亡
+        if (power_state->isPowerUp())
+        {
+            mario.update_texture("Resources/Images/BigMarioDeath.png");
+        }
+        else
+        {
+            mario.update_texture("Resources/Images/MarioDeath.png");
+        }
+
+        dead_state = std::make_shared<DeadState>(DeadState());
+    }
+    else if (power_state->toDie(mario))
+    {
+        std::cout << "播放死亡" << std::endl;
+        AudioManager::get_instance().playDeadEffect();
+        mario.update_texture("Resources/Images/MarioDeath.png");
+        dead_state = std::make_shared<DeadState>(DeadState());
+    }
 }

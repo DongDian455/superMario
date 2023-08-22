@@ -14,6 +14,9 @@ class AudioManager
 
     std::string cacheFileName;
 
+    sf::SoundBuffer dieEffectSoudBuffer;
+    sf::Sound dieEffectSound;
+
 private:
     AudioManager()
     {
@@ -24,6 +27,22 @@ private:
     ~AudioManager() {}
     AudioManager(const AudioManager &) = delete;
     AudioManager &operator=(const AudioManager &) = delete;
+
+    void playEffect(const std::string &filePath)
+    {
+
+        if (cacheFileName != filePath)
+        {
+            effectSoudBuffer.loadFromFile(filePath);
+            cacheFileName = filePath;
+            effectSound.stop();
+            effectSound.play();
+        }
+        else if (effectSound.getStatus() != sf::Sound::Playing)
+        {
+            effectSound.play();
+        }
+    }
 
 public:
     static AudioManager &get_instance()
@@ -44,40 +63,41 @@ public:
 
     void playJumpEffect()
     {
-        effectSound.stop();
-        std::string filePath("Resources/sound/jump.mp3");
-        if (cacheFileName != filePath)
-        {
-            effectSoudBuffer.loadFromFile(filePath);
-            cacheFileName = filePath;
-        }
-
-        effectSound.play();
+        playEffect("Resources/sound/smb_jump-small.wav");
     }
 
     void playCoinEffect()
     {
-        effectSound.stop();
-        std::string filePath("Resources/sound/coin.mp3");
-        if (cacheFileName != filePath)
-        {
-            effectSoudBuffer.loadFromFile(filePath);
-            cacheFileName = filePath;
-        }
-
-        effectSound.play();
+        playEffect("Resources/sound/smb_coin.wav");
     }
 
-       void playMushroomEffect()
+    void playMushroomEffect()
     {
-        effectSound.stop();
-        std::string filePath("Resources/sound/mushroom.wav");
-        if (cacheFileName != filePath)
-        {
-            effectSoudBuffer.loadFromFile(filePath);
-            cacheFileName = filePath;
-        }
+        playEffect("Resources/sound/smb_mushroom.wav");
+    }
 
-        effectSound.play();
+    void playPowerUpEffect()
+    {
+        playEffect("Resources/sound/smb_power_up.wav");
+    }
+
+    void playPowerDownEffect()
+    {
+        playEffect("Resources/sound/smb_power_down.wav");
+    }
+
+    void playDestoryBrickEffect()
+    {
+        playEffect("Resources/sound/smb_destory_bricks_up.wav");
+    }
+
+    void playKillEnemyEffect()
+    {
+        playEffect("Resources/sound/kill_enemy.mp3");
+    }
+
+    void playDeadEffect()
+    {
+        playEffect("Resources/sound/dead_1.mp3");
     }
 };

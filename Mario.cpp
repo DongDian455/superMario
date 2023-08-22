@@ -7,7 +7,7 @@
 
 Mario::Mario() : posX(0), posY(0), flipped(0)
 {
-    state_machine.setState(toStr(IdelState));
+
     mario_sprite.setTexture(mario_texture);
     mario_sprite.setPosition(posX, posY);
 }
@@ -43,7 +43,7 @@ void Mario::update_texture(const std::string &file)
 sf::FloatRect Mario::get_hit_box()
 {
     // The hitbox will be small if Mario is small or crouching.
-    if (!state_machine.isPowerUpState() || state_machine.isCrouching())
+    if (!state_manager.isPowerUpState() || state_manager.isCrouching())
     {
         return sf::FloatRect(posX, posY, CELL_SIZE, CELL_SIZE);
     }
@@ -53,30 +53,14 @@ sf::FloatRect Mario::get_hit_box()
     }
 }
 
-// void Mario::set_position_x(const int x)
-// {
-
-//     if (x >= 0)
-//     {
-//         posX = x;
-//     }
-// }
-
-// void Mario::set_position_y(const int y)
-// {
-//     if (y >= 0)
-//     {
-//         posY = y;
-//     }
-// }
 
 void Mario::draw_mario(sf::RenderWindow &i_window)
 {
     mario_sprite.setPosition(round(posX), round(posY));
+    //绘制前更新状态
+    state_manager.update(this, i_window);
 
-    update_pos(i_window);
-
-    if (state_machine.canDraw())
+    if (state_manager.canDraw())
     {
         if (0 == flipped)
         {
@@ -88,14 +72,4 @@ void Mario::draw_mario(sf::RenderWindow &i_window)
         }
         i_window.draw(mario_sprite);
     }
-}
-
-void Mario::update_pos(sf::RenderWindow &i_window)
-{
-    state_machine.update(this, i_window);
-}
-
-void Mario::setPowerState(bool isPowerUp)
-{
-    state_machine.setPowerState(this, isPowerUp);
 }

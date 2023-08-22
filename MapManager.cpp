@@ -267,13 +267,14 @@ int MapManager::get_map_size()
     return map.size();
 }
 
-std::pair<short, short> MapManager::get_mario_birth_pos() const
+std::pair<short, short> MapManager::init_mario_and_enemy_pos() const
 {
-    unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE)) * 0.5f;
+    unsigned short map_end = ceil((SCREEN_WIDTH) / static_cast<float>(CELL_SIZE));
     unsigned short map_start = 0;
     unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
 
-    for (unsigned short a = map_start; a < map_end; a++)
+    std::pair mario(-1, -1);
+    for (unsigned short a = map_start; a < map_sketch.getSize().x; a++)
     {
         // 从第二层开始遍历
         for (unsigned short b = map_height; b < map_height * 2; b++)
@@ -283,12 +284,20 @@ std::pair<short, short> MapManager::get_mario_birth_pos() const
             // this color is unqiue in the sketch‘ second layer
             if (sf::Color(255, 0, 0) == pixel)
             {
-                return std::pair(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+                mario = std::pair(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+            }
+            else if (sf::Color(182, 73, 0) == pixel)
+            {
+                GenerateManager::get_instance().add_enemy(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+            }
+            else if (sf::Color(0, 219, 0) == pixel)
+            {
+                // GenerateManager::get_instance().add_enemy(CELL_SIZE * a, CELL_SIZE * (b - map_height));
             }
         }
     }
 
-    return std::pair(-1, -1);
+    return mario;
 }
 
 void MapManager::map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const
@@ -405,11 +414,10 @@ void MapManager::update_map_cell_info()
 
 void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const unsigned int i_view_x)
 {
-  
+
     unsigned short map_end = ceil((SCREEN_WIDTH + i_view_x) / static_cast<float>(CELL_SIZE));
     unsigned short map_start = floor(i_view_x / static_cast<float>(CELL_SIZE));
     unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
-
 
     for (unsigned short a = map_start; a < map_end; a++)
     {
@@ -427,11 +435,11 @@ void MapManager::draw_map(sf::RenderWindow &i_window, const bool draw_bg, const 
             {
                 if (Cell::Coin == map[a][b])
                 {
-                    GenerateManager::get_instance().draw_coin_animation(i_window,CELL_SIZE * a, CELL_SIZE * b);
+                    GenerateManager::get_instance().draw_coin_animation(i_window, CELL_SIZE * a, CELL_SIZE * b);
                 }
                 else if (Cell::QuestionBlock == map[a][b])
                 {
-                    GenerateManager::get_instance().draw_question_animation(i_window,CELL_SIZE * a, CELL_SIZE * b);
+                    GenerateManager::get_instance().draw_question_animation(i_window, CELL_SIZE * a, CELL_SIZE * b);
                 }
                 else
                 {

@@ -10,26 +10,11 @@ typedef std::function<void(bool)> FunUpdateAnimation;
 
 class Mario;
 
-class StateMachine;
+class StateManager;
 
-class PowerState
-{
-    unsigned short growth_timer;
-    bool is_power_up;
-    unsigned short invincible_timer;
-
-public:
-    PowerState();
-
-    bool isPowerUp();
-
-    void setPower(Mario *mario,const bool power);
-
-    void update(Mario *mario,
-                const std::string normal,
-                const std::string power,
-                FunUpdateAnimation *fun);
-};
+class PowerState;
+class MoveState;
+class DeadState;
 
 // 状态类
 class State
@@ -38,7 +23,7 @@ protected:
     std::shared_ptr<PowerState> power_up_state;
 
 public:
-    virtual void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) = 0;
+    virtual void handle(Mario *mario, sf::RenderWindow &i_window) = 0;
     virtual bool canDrawMario()
     {
         return true;
@@ -50,32 +35,35 @@ public:
     }
 };
 
-class DeadState : public State
-{
-public:
-    void handle(StateMachine &i_state_machine, Mario *mario, sf::RenderWindow &i_window) override;
-};
-
+// class DeadState : public State
+// {
+// public:
+//     void handle(Mario *mario, sf::RenderWindow &i_window) override;
+// };
 
 // 状态机类
-class StateMachine
+class StateManager
 {
 public:
-    StateMachine();
-
-    void setState(std::string &&clazz);
+    StateManager();
 
     void update(Mario *mario, sf::RenderWindow &i_window);
 
     bool canDraw();
 
-    void setPowerState(Mario *mario,bool isPowerUp);
+    void setPowerState(Mario *mario, bool isPowerUp);
 
     bool isPowerUpState();
     bool isCrouching();
+    ~StateManager() {}
+
+    bool isFalling();
+    void updateJumpSpeed(const float i_value);
+    void die(const short type,Mario &mario);
 
 private:
-    std::map<std::string, State *> m_states;
-    State *m_currentState;
-    std::shared_ptr<PowerState> power_up_state;
+    std::shared_ptr<PowerState> power_state;
+    std::shared_ptr<MoveState> move_state;
+    std::shared_ptr<DeadState> dead_state;
+    
 };

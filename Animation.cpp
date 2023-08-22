@@ -5,9 +5,10 @@
 Animation::Animation(const unsigned short i_frame_width,
                      const std::string &i_texture_location,
                      const unsigned short i_animation_speed) : animation_speed(std::max<unsigned short>(1, i_animation_speed)),
-                                                               current_frame(0),
+                                                               flipped(1),
                                                                frame_width(i_frame_width),
-                                                               flipped(1)
+                                                               current_frame(0)
+
 {
     texture.loadFromFile(i_texture_location);
     total_frames = texture.getSize().x / frame_width;

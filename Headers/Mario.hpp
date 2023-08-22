@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-class StateMachine;
+class StateManager;
 
 class Mario
 {
@@ -12,9 +12,8 @@ class Mario
 
     sf::Sprite mario_sprite;
 
-    StateMachine state_machine;
-
 public:
+    StateManager state_manager;
     Mario();
 
     // 马里奥的位置
@@ -24,11 +23,11 @@ public:
     bool flipped;
 
     /// @brief 更新马里奥的位置
-    /// @param x 
-    /// @param y 
+    /// @param x
+    /// @param y
     /// @param is_update_pos true更新精灵图和真实位置， false只更新精灵图位置
-    void set_position(const int x, const int y,const bool is_update_pos=true);
-    
+    void set_position(const int x, const int y, const bool is_update_pos = true);
+
     void set_flipped(const bool flipped);
 
     void update_texture(const std::string &file);
@@ -37,9 +36,6 @@ public:
 
     void draw_mario(sf::RenderWindow &i_window);
 
-    void update_pos(sf::RenderWindow &i_window);
-
-    void setPowerState(bool isPowerUp);
 
     sf::FloatRect get_hit_box();
 };

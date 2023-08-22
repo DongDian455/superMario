@@ -7,12 +7,12 @@
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/Animation.hpp"
 
-
 #include "Headers/MapManager.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
 #include "Headers/GenerateManager.hpp"
 #include "Headers/MarioState.hpp"
+#include "Headers/AudioManager.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -23,7 +23,7 @@ int main()
     MapManager::get_instance().convert_map_to_cell("Resources/Images/LevelSketch0.png");
 
     Mario mario;
-    auto mario_pos = MapManager::get_instance().get_mario_birth_pos();
+    auto mario_pos = MapManager::get_instance().init_mario_and_enemy_pos();
     mario.set_position(mario_pos.first, mario_pos.second);
 
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH * SCREEN_RESIZE, SCREEN_HEIGHT * SCREEN_RESIZE), "Super Mario", sf::Style::Close);
@@ -36,6 +36,8 @@ int main()
     unsigned int view_x = 0;
 
     steady_clock::time_point current_time = steady_clock::now();
+    
+    AudioManager::get_instance().playBgMusic();
 
     while (window.isOpen())
     {
@@ -66,8 +68,7 @@ int main()
         MapManager::get_instance().draw_map(window, true, view_x);
 
         // 绘制地图之外的物体信息
-        GenerateManager::get_instance().draw_info(window, view_x,mario);
-
+        GenerateManager::get_instance().draw_info(window, view_x, mario);
         // 绘制地图,要在其他物体之后，这样可以让物体绘制在地图后面
         MapManager::get_instance().draw_map(window, false, view_x);
         // 绘制马里奥

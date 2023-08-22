@@ -24,14 +24,17 @@ constexpr unsigned short QUESTION_BLOCK_ANIMATION_SPEED = 8;
 
 constexpr float BRICK_PARTICLE_SPEED = 4;
 constexpr float COIN_JUMP_SPEED = -6;
-//屏幕外的绘制范围
+// 屏幕外的绘制范围
 constexpr unsigned short ENTITY_UPDATE_AREA = 64;
-//蘑菇移动速度
+// 蘑菇移动速度
 constexpr float MUSHROOM_SPEED = 1;
-//马里奥变大持续时间
+// 马里奥变大持续时间
 constexpr unsigned char MARIO_GROWTH_DURATION = 64;
-//马里奥变大闪烁间隔
+// 马里奥变大闪烁间隔
 constexpr unsigned char MARIO_BLINKING = 4;
+
+constexpr unsigned char MARIO_DEATH_DURATION = 32;
+constexpr unsigned char MARIO_INVINCIBILITY_DURATION = 128;
 
 struct MoveCell
 {

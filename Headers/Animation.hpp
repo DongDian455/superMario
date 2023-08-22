@@ -2,12 +2,14 @@
 
 class Animation
 {
+    // After how many frames do we change the current_frame?
+    unsigned short animation_speed;
+    
     bool flipped;
     unsigned short frame_width;
     unsigned short total_frames;
     unsigned short current_frame;
-    // After how many frames do we change the current_frame?
-    unsigned short animation_speed;
+
     // We'll increment the current_frame as soon as this iterator reaches the animation_speed.
     unsigned short animation_iterator;
     sf::Sprite sprite;

@@ -66,7 +66,10 @@ public:
     // 获取背景的绘制区域
     std::pair<short, short> get_bg_rect(const unsigned int posX, const unsigned int posY, const unsigned int map_height);
 
-    std::pair<short, short> get_mario_birth_pos() const;
+    /// @brief 初始化敌人和马里奥
+    /// @return 返回马里奥的位置 
+    std::pair<short, short> init_mario_and_enemy_pos() const;
+    
 
     // 获取整个地图元素个数
     int get_map_size();

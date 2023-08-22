@@ -1,12 +1,15 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
 #include "Headers/Animation.hpp"
 #include "Headers/GlobalConfig.hpp"
 #include "Headers/MarioState.hpp"
 #include "Headers/Mario.hpp"
+#include "Headers/Enemy.hpp"
+#include "Headers/Goomba.hpp"
 #include "Headers/GenerateManager.hpp"
+#include "Headers/AudioManager.hpp"
 
 void GenerateManager::add_brick_particles(const unsigned short i_x, const unsigned short i_y)
 {
@@ -29,6 +32,11 @@ void GenerateManager::add_mushroom(const unsigned short i_x, const unsigned shor
     mushrooms.push_back(Mushroom(i_x, i_y));
 }
 
+void GenerateManager::add_enemy(const unsigned short i_x, const unsigned short i_y)
+{
+    enemies.push_back(std::make_shared<Goomba>(false, i_x, i_y));
+}
+
 void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
 {
 
@@ -39,7 +47,7 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
         if (1 == mario.get_hit_box().intersects(mushroom.get_hit_box()))
         {
             mushroom.set_dead(1);
-            mario.setPowerState(true);
+            mario.state_manager.setPowerState(&mario, true);
         }
     }
 
@@ -73,6 +81,36 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
     mushrooms.erase(remove_if(mushrooms.begin(), mushrooms.end(), [](const Mushroom &i_mushroom)
                               { return 1 == i_mushroom.get_dead(); }),
                     mushrooms.end());
+
+    for (unsigned short a = 0; a < enemies.size(); a++)
+    {
+        enemies[a]->update(i_view_x, enemies, mario);
+
+        if (1 != enemies[a]->get_dead(0) && 1 == mario.get_hit_box().intersects(enemies[a]->get_hit_box()))
+        {
+            if (mario.state_manager.isFalling())
+            {
+                AudioManager::get_instance().playKillEnemyEffect();
+                enemies[a]->die(1);
+                mario.state_manager.updateJumpSpeed(0.6f * MARIO_JUMP_SPEED);
+            }
+            else
+            {
+                mario.state_manager.die(1, mario);
+            }
+        }
+    }
+
+    for (unsigned short a = 0; a < enemies.size(); a++)
+    {
+        if (1 == enemies[a]->get_dead(1))
+        {
+            // We don't have to worry about memory leaks since we're using SMART POINTERS!
+            enemies.erase(a + enemies.begin());
+
+            a--;
+        }
+    }
 }
 
 void GenerateManager::draw_info(sf::RenderWindow &i_window, const unsigned int i_view_x, Mario &mario)
@@ -94,6 +132,11 @@ void GenerateManager::draw_info(sf::RenderWindow &i_window, const unsigned int i
     for (Mushroom &mushroom : mushrooms)
     {
         mushroom.draw(i_view_x, i_window);
+    }
+
+    for (unsigned short a = 0; a < enemies.size(); a++)
+    {
+        enemies[a]->draw(i_view_x, i_window);
     }
 }
 
