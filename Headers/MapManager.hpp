@@ -85,7 +85,6 @@ public:
     void map_collision(const std::vector<Cell> &i_check_cells, std::vector<sf::Vector2i> &i_collision_cells, const sf::FloatRect &i_hitbox) const;
 
     void set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell);
-    Cell get_map_cell(const int x, const int y);
 
     sf::Color get_map_sketch_pixel(const unsigned short i_x, const unsigned short i_y) const;
 };

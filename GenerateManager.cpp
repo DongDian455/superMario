@@ -31,7 +31,7 @@ void GenerateManager::add_mushroom(const unsigned short i_x, const unsigned shor
 
 void GenerateManager::add_enemy(const unsigned short i_x, const unsigned short i_y)
 {
-    enemies.push_back(std::make_shared<Goomba>(false, i_x, i_y));
+    enemies.push_back(std::make_shared<Goomba>(i_x, i_y));
 }
 
 void GenerateManager::update(const unsigned int i_view_x, Mario &mario)

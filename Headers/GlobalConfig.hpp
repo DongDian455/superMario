@@ -3,7 +3,7 @@
 // 屏幕信息
 constexpr unsigned short SCREEN_HEIGHT = 240;
 constexpr unsigned short SCREEN_WIDTH = 320;
-constexpr unsigned char SCREEN_RESIZE = 1;
+constexpr unsigned char SCREEN_RESIZE = 2;
 // 绘制的基准大小！
 constexpr unsigned short CELL_SIZE = 16;
 

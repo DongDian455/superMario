@@ -364,10 +364,6 @@ bool MapManager::map_collision(const std::vector<Cell> &i_check_cells, const sf:
     return false;
 }
 
-Cell MapManager::get_map_cell(const int x, const int y){
-
-};
-
 void MapManager::set_map_cell(const unsigned short i_x, const unsigned short i_y, const Cell &i_cell)
 {
     map[i_x][i_y] = i_cell;
