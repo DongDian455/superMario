@@ -27,12 +27,11 @@ void HitBoxUtils::check_mario_hit_coin(const sf::FloatRect &i_hitbox)
     std::vector<sf::Vector2i> cells;
     MapManager::get_instance().map_collision({Cell::QuestionBlock}, cells, i_hitbox);
 
-    // Activating question blocks!!!!
     for (const sf::Vector2i &cell : cells)
     {
         MapManager::get_instance().set_map_cell(cell.x, cell.y, Cell::ActivatedQuestionBlock);
 
-        // It can be either a mushroom or a coin, depending on the color of the pixel in the sketch.
+       
         if (sf::Color(255, 73, 85) == MapManager::get_instance().get_map_sketch_pixel(cell.x, cell.y))
         {
             AudioManager::get_instance().playMushroomEffect();

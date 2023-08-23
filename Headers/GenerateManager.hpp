@@ -47,7 +47,7 @@ public:
     void add_question_block_coin(const unsigned short i_x, const unsigned short i_y);
     void add_mushroom(const unsigned short i_x, const unsigned short i_y);
     void add_enemy(const unsigned short i_x, const unsigned short i_y);
-
+    //元素动画
     void draw_coin_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);
     void draw_question_animation(sf::RenderWindow &i_window, unsigned int x, unsigned int y);
 
