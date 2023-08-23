@@ -8,7 +8,7 @@ Super Mario是一个使用SFML图形库实现的小游戏。
 
 
 项目基于[Kofybrek](https://www.youtube.com/@Kofybrek)作者的基础上修改.  
-**其项目介绍地址：**
+其项目介绍地址:
 - Part 1: https://youtu.be/7D4uoSoQsjw
 - Part 2: https://youtu.be/6SnGgsgV_GY
 
