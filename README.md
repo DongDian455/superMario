@@ -1,5 +1,6 @@
 # superMario
-https://github.com/DongDian455/superMario/assets/30856596/11f2ad33-7ff4-471e-a098-3301502309da
+https://github.com/DongDian455/superMario/assets/30856596/73b9bcfe-45d7-49ba-9b81-d7df66692d8e
+
 
 Super Mario是一个使用SFML图形库实现的小游戏。
 ---
