@@ -11,7 +11,7 @@ Super Mario是一个使用SFML图形库实现的小游戏。
 - Part 1: https://youtu.be/7D4uoSoQsjw
 - Part 2: https://youtu.be/6SnGgsgV_GY
 
-> 本人只是用于练习c++语法使用，当然因为是自己的一个练手项目，会重新根据自己的编码风格以及设计模式重新设计,以及会完善音频部分Ï
+> 本人只是用于练习c++语法使用，当然因为是自己的一个练手项目，会重新根据自己的编码风格以及设计模式重新设计,以及会完善音频部分
 
 ## 思路
 [1_帧率设置](https://github.com/DongDian455/superMario/blob/master/aricles/1_%E5%B8%A7%E7%8E%87%E8%AE%BE%E7%BD%AE.md)  
