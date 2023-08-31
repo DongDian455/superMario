@@ -150,7 +150,7 @@ std::pair<short, short> MapManager::get_cell_rect(const unsigned int posX, const
         }
     }
 
-    return std::pair(sprite_x, sprite_y);
+    return std::pair<short,short>(sprite_x, sprite_y);
 }
 
 std::pair<short, short> MapManager::get_bg_rect(const unsigned int posX, const unsigned int posY, const unsigned int map_height)
@@ -261,11 +261,11 @@ std::pair<short, short> MapManager::get_bg_rect(const unsigned int posX, const u
                 sprite_y = 1;
             }
         }
-        return std::pair(sprite_x, sprite_y);
+        return std::pair<short,short>(sprite_x, sprite_y);
     }
     else
     {
-        return std::pair(-1, -1);
+        return std::pair<short,short>(-1, -1);
     }
 }
 
@@ -279,7 +279,7 @@ std::pair<short, short> MapManager::init_mario_and_enemy_pos() const
 
     unsigned short map_height = floor(static_cast<float>(map_sketch.getSize().y) / MAP_SKETCH_LAYER);
 
-    std::pair mario(-1, -1);
+    std::pair<short,short> mario(-1, -1);
     for (unsigned short a = 0; a < map_sketch.getSize().x; a++)
     {
         // 从第二层开始遍历
@@ -291,7 +291,7 @@ std::pair<short, short> MapManager::init_mario_and_enemy_pos() const
             if (sf::Color(255, 0, 0) == pixel)
             {
                 // 马里奥位置
-                mario = std::pair(CELL_SIZE * a, CELL_SIZE * (b - map_height));
+                mario = std::pair<short,short>(CELL_SIZE * a, CELL_SIZE * (b - map_height));
             }
             else if (sf::Color(182, 73, 0) == pixel)
             {

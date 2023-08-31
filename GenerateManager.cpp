@@ -63,11 +63,11 @@ void GenerateManager::update(const unsigned int i_view_x, Mario &mario)
         brick_particle.y += brick_particle.vertical_speed;
     }
 
-    brick_particles.erase(remove_if(brick_particles.begin(), brick_particles.end(), [](const auto &i_brick_particle)
+    brick_particles.erase(remove_if(brick_particles.begin(), brick_particles.end(), [](const MoveCell &i_brick_particle)
                                     { return SCREEN_HEIGHT <= i_brick_particle.y; }),
                           brick_particles.end());
 
-    question_block_coins.erase(remove_if(question_block_coins.begin(), question_block_coins.end(), [](const auto &i_question_block_coin)
+    question_block_coins.erase(remove_if(question_block_coins.begin(), question_block_coins.end(), [](const MoveCell &i_question_block_coin)
                                          { return 0 <= i_question_block_coin.vertical_speed; }),
                                question_block_coins.end());
 
